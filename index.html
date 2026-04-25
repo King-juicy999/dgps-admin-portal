@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Portal — Diadem Golden Pearl Schools</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="static/css/admin.css">
+</head>
+<body>
+
+  <!-- ══════════════════════════════
+       LOGIN PAGE
+  ══════════════════════════════ -->
+  <div id="page-login" class="page active">
+    <div class="login-wrap">
+      <div class="login-left">
+        <div class="login-grid"></div>
+        <div class="login-scan"></div>
+        <div class="login-corner tl"></div>
+        <div class="login-corner br"></div>
+        <div class="login-left-content">
+          <div class="login-logo">
+            <div class="login-logo-mark">
+              <svg viewBox="0 0 24 24"><path d="M12 2L3 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-9-5z"/></svg>
+            </div>
+            <div class="login-logo-name">DGPS<span>Admin Portal</span></div>
+          </div>
+          <div class="login-tagline">
+            <h2>Manage your school,<br><em>simply.</em></h2>
+            <p>Secure access for authorised<br>Diadem Golden Pearl Schools staff only.</p>
+          </div>
+        </div>
+      </div>
+      <div class="login-right">
+        <div class="login-form-wrap">
+          <div class="login-form-title">Welcome back</div>
+          <div class="login-form-sub">Sign in to your admin account</div>
+          <div class="lf-group">
+            <label>Email address</label>
+            <input class="lf-input" type="email" id="login-email" placeholder="you@dgpschools.com">
+          </div>
+          <div class="lf-group">
+            <label>Password</label>
+            <input class="lf-input" type="password" id="login-password" placeholder="••••••••••">
+            <div class="lf-sub">Your password was set by the Super Admin</div>
+          </div>
+          <div class="lf-error" id="login-error"></div>
+          <button class="login-btn" onclick="doLogin()">Sign in to portal</button>
+          <div class="login-forgot">Forgot password? <a href="mailto:dgpschools2024@gmail.com">Contact Super Admin</a></div>
+          <div class="login-security">
+            <svg viewBox="0 0 24 24" width="10" height="10" fill="#9ab09e"><path d="M12 2L3 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-9-5z"/></svg>
+            <span>Secured · Diadem Golden Pearl Schools · 2025</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       MAIN PORTAL
+  ══════════════════════════════ -->
+  <div id="page-portal" class="page">
+    <div class="portal-wrap">
+
+      <!-- SIDEBAR -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sb-top">
+          <div class="sb-brand">
+            <div class="sb-mark">
+              <svg viewBox="0 0 24 24"><path d="M12 2L3 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-9-5z"/></svg>
+            </div>
+            <div class="sb-name">DGPS<span>Admin Portal</span></div>
+          </div>
+          <div class="sb-role-wrap">
+            <div class="sb-role-dot"></div>
+            <span class="sb-role-txt" id="sb-role-label">Super Admin</span>
+          </div>
+        </div>
+
+        <nav class="sb-nav">
+          <div class="sb-sec">Overview</div>
+          <button class="sb-btn active" data-view="dashboard" onclick="navTo('dashboard', this)">
+            <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+            Dashboard
+          </button>
+
+          <div class="sb-sec">Students</div>
+          <button class="sb-btn" data-view="applications" onclick="navTo('applications', this)">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/></svg>
+            Applications
+            <span class="sb-badge">24</span>
+          </button>
+          <button class="sb-btn" data-view="payments" onclick="navTo('payments', this)">
+            <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+            Payments
+          </button>
+
+          <div class="sb-sec">Communications</div>
+          <button class="sb-btn sb-ai-btn" data-view="ai" onclick="navTo('ai', this)">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+            DGPS AI assistant
+          </button>
+          <button class="sb-btn" data-view="announcements" onclick="navTo('announcements', this)">
+            <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+            Announcements
+            <span class="sb-badge">1</span>
+          </button>
+          <button class="sb-btn" data-view="calendar" onclick="navTo('calendar', this)">
+            <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+            Calendar
+          </button>
+
+          <div class="sb-sec super-only" id="sb-super-section">Super Admin</div>
+          <button class="sb-btn super-only" data-view="manage-admins" onclick="navTo('manage-admins', this)" id="sb-manage-admins">
+            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+            Manage admins
+          </button>
+          <button class="sb-btn super-only" data-view="activity-log" onclick="navTo('activity-log', this)" id="sb-activity-log">
+            <svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.95-2.05L6.64 18.36C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9z"/></svg>
+            Activity log
+          </button>
+        </nav>
+
+        <div class="sb-foot">
+          <div class="sb-user">
+            <div class="sb-av" id="sb-avatar">WA</div>
+            <div class="sb-user-info">
+              <div class="sb-uname" id="sb-username">William A.</div>
+              <div class="sb-urole" id="sb-urole">Super Admin</div>
+            </div>
+            <svg class="sb-logout-icon" viewBox="0 0 24 24" onclick="doLogout()"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+          </div>
+        </div>
+      </aside>
+
+      <!-- MOBILE OVERLAY -->
+      <div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
+
+      <!-- MAIN CONTENT -->
+      <div class="main-wrap">
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+          <button class="topbar-hamburger" onclick="openSidebar()">
+            <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+          </button>
+          <span class="topbar-title" id="topbar-title">Dashboard</span>
+          <div class="topbar-right">
+            <input class="topbar-search" type="text" placeholder="Search students…">
+            <div class="topbar-icon notif-dot">
+              <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEWS -->
+        <div class="content-area">
+
+          <!-- ── DASHBOARD ── -->
+          <div class="view active" id="view-dashboard">
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-label">Applications</div>
+                <div class="stat-value">24</div>
+                <div class="stat-sub up">+3 this week</div>
+                <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6z"/></svg></div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Payments received</div>
+                <div class="stat-value">19</div>
+                <div class="stat-sub up">₦95,000 total</div>
+                <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg></div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Unpaid</div>
+                <div class="stat-value">5</div>
+                <div class="stat-sub warn">Follow up needed</div>
+                <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg></div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Emails sent</div>
+                <div class="stat-value">2</div>
+                <div class="stat-sub">Last: 3 days ago</div>
+                <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></div>
+              </div>
+            </div>
+
+            <div class="section-hdr">
+              <div class="section-title">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6z"/></svg>
+                Recent applications
+              </div>
+              <button class="btn btn-outline" onclick="navTo('applications', document.querySelector('[data-view=applications]'))">View all</button>
+            </div>
+            <div class="table-card">
+              <div class="table-wrap">
+                <table>
+                  <colgroup><col style="width:25%"><col style="width:15%"><col style="width:22%"><col style="width:18%"><col style="width:20%"></colgroup>
+                  <thead><tr><th>Student</th><th>Class</th><th>Parent</th><th>Reference</th><th>Actions</th></tr></thead>
+                  <tbody>
+                    <tr><td><div class="t-name">Amara Okonkwo</div></td><td class="t-sub">JSS 1</td><td>Mrs. Okonkwo</td><td><span class="t-ref">TXN-00821</span></td><td><div class="action-row"><div class="act-btn"><svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></div><div class="act-btn danger"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></div></div></td></tr>
+                    <tr><td><div class="t-name">Tobenna Eze</div></td><td class="t-sub">Primary 4</td><td>Mr. Eze</td><td><span class="t-ref">TXN-00820</span></td><td><div class="action-row"><div class="act-btn"><svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></div><div class="act-btn danger"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></div></div></td></tr>
+                    <tr><td><div class="t-name">Sade Adeyemi</div></td><td class="t-sub">SS 2</td><td>Dr. Adeyemi</td><td><span class="t-ref">—</span></td><td><div class="action-row"><div class="act-btn"><svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></div><div class="act-btn danger"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></div></div></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="two-col">
+              <div class="panel-card">
+                <div class="panel-title"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>Recent announcements</div>
+                <div class="ann-item">
+                  <div class="ann-icon sched"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg></div>
+                  <div class="ann-body"><div class="ann-label">Entrance exam — May 12</div><div class="ann-meta">Fires at 8am · 19 parents</div></div>
+                  <span class="ann-badge sched">Scheduled</span>
+                </div>
+                <div class="ann-item">
+                  <div class="ann-icon sent"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></div>
+                  <div class="ann-body"><div class="ann-label">Resumption notice — 2nd term</div><div class="ann-meta">Sent Apr 21 · 19 parents</div></div>
+                  <span class="ann-badge sent">Sent</span>
+                </div>
+              </div>
+              <div class="panel-card">
+                <div class="panel-title"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>April 2025</div>
+                <div class="mini-cal">
+                  <div class="cal-grid">
+                    <div class="cl">S</div><div class="cl">M</div><div class="cl">T</div><div class="cl">W</div><div class="cl">T</div><div class="cl">F</div><div class="cl">S</div>
+                    <div class="cd other">30</div><div class="cd other">31</div><div class="cd">1</div><div class="cd">2</div><div class="cd">3</div><div class="cd">4</div><div class="cd">5</div>
+                    <div class="cd">6</div><div class="cd">7</div><div class="cd">8</div><div class="cd">9</div><div class="cd">10</div><div class="cd">11</div><div class="cd">12</div>
+                    <div class="cd">13</div><div class="cd">14</div><div class="cd">15</div><div class="cd">16</div><div class="cd">17</div><div class="cd">18</div><div class="cd">19</div>
+                    <div class="cd">20</div><div class="cd">21</div><div class="cd">22</div><div class="cd">23</div><div class="cd today">24</div><div class="cd">25</div><div class="cd">26</div>
+                    <div class="cd">27</div><div class="cd">28</div><div class="cd">29</div><div class="cd">30</div><div class="cd other has-ev">1</div><div class="cd other">2</div><div class="cd other">3</div>
+                  </div>
+                </div>
+                <div class="cal-legend"><span class="cal-dot"></span>May 1 — exam announcement auto-fires</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── APPLICATIONS ── -->
+          <div class="view" id="view-applications">
+            <div class="section-hdr">
+              <div class="section-title"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6z"/></svg>All applications</div>
+              <div class="section-actions">
+                <button class="btn btn-outline"><svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>Export CSV</button>
+                <div class="filter-pill active">All (24)</div>
+                <div class="filter-pill">Paid (19)</div>
+                <div class="filter-pill">Unpaid (5)</div>
+              </div>
+            </div>
+            <div class="table-card">
+              <div class="table-wrap">
+                <table>
+                  <colgroup><col style="width:20%"><col style="width:13%"><col style="width:18%"><col style="width:14%"><col style="width:12%"><col style="width:23%"></colgroup>
+                  <thead><tr><th>Student</th><th>Class</th><th>Parent</th><th>Reference</th><th>Amount</th><th>Actions</th></tr></thead>
+                  <tbody>
+                    <tr><td><div class="t-name">Amara Okonkwo</div></td><td class="t-sub">JSS 1</td><td>Mrs. Okonkwo</td><td><span class="t-ref">TXN-00821</span></td><td>₦5,000</td><td><div class="action-row"><div class="act-btn"><svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></div><div class="act-btn danger"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></div></div></td></tr>
+                    <tr><td><div class="t-name">Tobenna Eze</div></td><td class="t-sub">Primary 4</td><td>Mr. Eze</td><td><span class="t-ref">TXN-00820</span></td><td>₦5,000</td><td><div class="action-row"><div class="act-btn"><svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></div><div class="act-btn danger"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></div></div></td></tr>
+                    <tr><td><div class="t-name">Sade Adeyemi</div></td><td class="t-sub">SS 2</td><td>Dr. Adeyemi</td><td><span class="t-ref">—</span></td><td class="unpaid-text">Unpaid</td><td><div class="action-row"><div class="act-btn"><svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></div><div class="act-btn danger"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></div></div></td></tr>
+                    <tr><td><div class="t-name">Chidera Nwosu</div></td><td class="t-sub">Playgroup 2</td><td>Mrs. Nwosu</td><td><span class="t-ref">TXN-00818</span></td><td>₦5,000</td><td><div class="action-row"><div class="act-btn"><svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></div><div class="act-btn danger"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></div></div></td></tr>
+                    <tr><td><div class="t-name">Blessing Okafor</div></td><td class="t-sub">Primary 1</td><td>Mr. Okafor</td><td><span class="t-ref">—</span></td><td class="unpaid-text">Unpaid</td><td><div class="action-row"><div class="act-btn"><svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></div><div class="act-btn danger"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></div></div></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── PAYMENTS ── -->
+          <div class="view" id="view-payments">
+            <div class="stats-grid three-col">
+              <div class="stat-card"><div class="stat-label">Total collected</div><div class="stat-value">₦95,000</div><div class="stat-sub up">19 payments</div></div>
+              <div class="stat-card"><div class="stat-label">Outstanding</div><div class="stat-value">5</div><div class="stat-sub warn">Not yet paid</div></div>
+              <div class="stat-card"><div class="stat-label">Avg. time to pay</div><div class="stat-value">1.4d</div><div class="stat-sub">after applying</div></div>
+            </div>
+            <div class="table-card">
+              <div class="table-wrap">
+                <table>
+                  <colgroup><col style="width:22%"><col style="width:18%"><col style="width:18%"><col style="width:14%"><col style="width:14%"><col style="width:14%"></colgroup>
+                  <thead><tr><th>Student</th><th>Parent</th><th>Reference</th><th>Amount</th><th>Date</th><th>Paid</th></tr></thead>
+                  <tbody>
+                    <tr><td><div class="t-name">Amara Okonkwo</div></td><td>Mrs. Okonkwo</td><td><span class="t-ref">TXN-00821</span></td><td>₦5,000</td><td class="t-sub">Apr 24</td><td><svg width="14" height="14" viewBox="0 0 24 24" fill="#0a7a24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></td></tr>
+                    <tr><td><div class="t-name">Tobenna Eze</div></td><td>Mr. Eze</td><td><span class="t-ref">TXN-00820</span></td><td>₦5,000</td><td class="t-sub">Apr 23</td><td><svg width="14" height="14" viewBox="0 0 24 24" fill="#0a7a24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></td></tr>
+                    <tr><td><div class="t-name">Sade Adeyemi</div></td><td>Dr. Adeyemi</td><td><span class="t-ref">—</span></td><td class="unpaid-text">—</td><td class="t-sub">—</td><td><svg width="14" height="14" viewBox="0 0 24 24" fill="#d97706"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></td></tr>
+                    <tr><td><div class="t-name">Chidera Nwosu</div></td><td>Mrs. Nwosu</td><td><span class="t-ref">TXN-00818</span></td><td>₦5,000</td><td class="t-sub">Apr 22</td><td><svg width="14" height="14" viewBox="0 0 24 24" fill="#0a7a24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── DGPS AI ASSISTANT ── -->
+          <div class="view ai-view" id="view-ai">
+            <div class="ai-shell">
+              <div class="ai-sidebar">
+                <div class="ai-sidebar-top">
+                  <div class="ai-sidebar-title">Compose</div>
+                  <button class="ai-new-btn">
+                    <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                    New message
+                  </button>
+                </div>
+                <div class="ai-hist-list">
+                  <div class="ai-hist-label">Recent</div>
+                  <div class="ai-hist-item active">
+                    <div class="ai-hist-title">Unpaid fee reminder</div>
+                    <div class="ai-hist-meta">Today · Email · 5 parents</div>
+                  </div>
+                  <div class="ai-hist-item">
+                    <div class="ai-hist-title">Exam notice — May 12</div>
+                    <div class="ai-hist-meta">Apr 22 · Email · All parents</div>
+                  </div>
+                  <div class="ai-hist-item">
+                    <div class="ai-hist-title">Welcome message</div>
+                    <div class="ai-hist-meta">Apr 10 · SMS + Email</div>
+                  </div>
+                  <div class="ai-hist-item">
+                    <div class="ai-hist-title">Resumption — 2nd term</div>
+                    <div class="ai-hist-meta">Apr 5 · Email · All parents</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="ai-main">
+                <div class="ai-main-top">
+                  <div>
+                    <div class="ai-main-title">Unpaid fee reminder</div>
+                    <div class="ai-main-sub">Draft ready · Not yet sent</div>
+                  </div>
+                  <div class="ai-draft-status">
+                    <span class="draft-dot"></span>Draft
+                  </div>
+                </div>
+
+                <div class="ai-body">
+                  <div class="ai-prompt-box">
+                    <div class="ai-box-label">Your instruction to the AI</div>
+                    <textarea class="ai-prompt-input" placeholder="e.g. Write a polite reminder to parents who haven't paid their application fee yet…">Write a polite but firm reminder to parents who haven't paid their application fee yet. Keep it professional and warm, signed from the school.</textarea>
+                    <div class="ai-prompt-actions">
+                      <span class="ai-hint-text">AI will draft from this · You can edit before sending</span>
+                      <button class="btn btn-green">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        Generate draft
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="ai-draft-box">
+                    <div class="ai-draft-header">
+                      <div class="ai-draft-header-title">
+                        <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                        AI draft
+                      </div>
+                      <span class="editable-badge">Editable</span>
+                    </div>
+                    <div class="ai-draft-body">
+                      <div class="ai-subject-label">Subject line</div>
+                      <div class="ai-subject-value" contenteditable="true">Friendly Reminder: Application Fee — Diadem Golden Pearl Schools</div>
+                      <div class="ai-message-body" contenteditable="true">Dear Parent,<br><br>We hope this message finds you well. We noticed that the application fee for your child's enrolment at Diadem Golden Pearl Schools has not yet been received.<br><br>To secure your child's place, kindly complete the payment at your earliest convenience. If you have any questions or need assistance, please do not hesitate to reach out to us directly.<br><br>Thank you for choosing DGPS — we look forward to welcoming your child.<br><br>Warm regards,<br>Diadem Golden Pearl Schools</div>
+                      <div class="ai-edit-note">
+                        <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/></svg>
+                        Click the subject or message above to edit directly
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="ai-recipients-box">
+                    <div class="ai-box-label">Recipients</div>
+                    <div class="ai-rcpt-tabs">
+                      <button class="ai-rcpt-tab" onclick="toggleRcptTab(this, 'all')">Send to all</button>
+                      <button class="ai-rcpt-tab active" onclick="toggleRcptTab(this, 'specific')">Specific people</button>
+                    </div>
+
+                    <div id="rcpt-specific">
+                      <div class="ai-chips" id="ai-chips">
+                        <div class="ai-chip">Sade Adeyemi <svg onclick="removeChip(this)" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></div>
+                        <div class="ai-chip">+234 803 000 1122 <svg onclick="removeChip(this)" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></div>
+                      </div>
+                      <input class="ai-search-input" type="text" placeholder="Search parent name, or type email / phone number…" oninput="filterRecipients(this.value)">
+                      <div class="ai-dropdown" id="ai-dropdown">
+                        <div class="ai-dropdown-item" onclick="addRecipient('Mrs. Nwosu', 'chidera.nwosu@gmail.com')">
+                          <div class="ai-rcpt-av">NO</div>
+                          <div><div class="ai-rcpt-name">Mrs. Nwosu</div><div class="ai-rcpt-contact">chidera.nwosu@gmail.com · +234 810 000 5566</div></div>
+                        </div>
+                        <div class="ai-dropdown-item" onclick="addRecipient('Mr. Eze', 'tobenna.eze@yahoo.com')">
+                          <div class="ai-rcpt-av">EZ</div>
+                          <div><div class="ai-rcpt-name">Mr. Eze</div><div class="ai-rcpt-contact">tobenna.eze@yahoo.com · +234 703 000 8877</div></div>
+                        </div>
+                        <div class="ai-dropdown-item" onclick="addRecipient('Dr. Adeyemi', 'dr.adeyemi@gmail.com')">
+                          <div class="ai-rcpt-av">AD</div>
+                          <div><div class="ai-rcpt-name">Dr. Adeyemi</div><div class="ai-rcpt-contact">dr.adeyemi@gmail.com · +234 901 000 2233</div></div>
+                        </div>
+                        <div class="ai-dropdown-add">
+                          <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                          Add email or phone not in database
+                        </div>
+                      </div>
+                    </div>
+
+                    <div id="rcpt-all" style="display:none;">
+                      <div class="ai-all-notice">Message will be sent to all 19 parents in the database.</div>
+                    </div>
+
+                    <div class="ai-channel-label">Send via</div>
+                    <div class="ai-channels">
+                      <div class="ai-channel active" onclick="toggleChannel(this)">
+                        <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                        Email
+                      </div>
+                      <div class="ai-channel" onclick="toggleChannel(this)">
+                        <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                        SMS
+                      </div>
+                      <div class="ai-channel" onclick="toggleChannel(this)">
+                        <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+                        WhatsApp
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="ai-footer">
+                  <button class="btn btn-outline">Save draft</button>
+                  <button class="btn btn-green">
+                    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                    Send now
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── ANNOUNCEMENTS ── -->
+          <div class="view" id="view-announcements">
+            <div class="two-col">
+              <div>
+                <div class="section-hdr"><div class="section-title"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>Schedule announcement</div></div>
+                <div class="panel-card">
+                  <div class="form-stack">
+                    <div class="form-row">
+                      <div class="form-field"><label>Type</label><select><option>Exam notice</option><option>Resumption</option><option>Fee reminder</option><option>Custom</option></select></div>
+                      <div class="form-field"><label>Send to</label><select><option>All parents (19)</option><option>Paid only (19)</option></select></div>
+                    </div>
+                    <div class="form-row">
+                      <div class="form-field"><label>Date</label><input type="date" value="2025-05-12"></div>
+                      <div class="form-field"><label>Time</label><input type="time" value="08:00"></div>
+                    </div>
+                    <div class="form-field"><label>Subject</label><input type="text" placeholder="e.g. Entrance exam — DGPS 2025"></div>
+                    <div class="form-field"><label>Message</label><textarea placeholder="Dear Parent, we are pleased to inform you…"></textarea></div>
+                    <div class="form-row">
+                      <button class="btn btn-outline" style="flex:1;">Preview</button>
+                      <button class="btn btn-green" style="flex:1;">Schedule</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div class="section-hdr"><div class="section-title">Log</div></div>
+                <div class="panel-card">
+                  <div class="ann-item"><div class="ann-icon sched"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg></div><div class="ann-body"><div class="ann-label">Entrance exam — May 12</div><div class="ann-meta">8:00AM · 19 recipients · William A.</div></div><span class="ann-badge sched">Scheduled</span></div>
+                  <div class="ann-item"><div class="ann-icon sent"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></div><div class="ann-body"><div class="ann-label">Resumption — 2nd term</div><div class="ann-meta">Sent Apr 21 · 19 delivered</div></div><span class="ann-badge sent">Sent</span></div>
+                  <div class="ann-item"><div class="ann-icon sent"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></div><div class="ann-body"><div class="ann-label">Application confirmed</div><div class="ann-meta">Sent Apr 10 · 14 delivered</div></div><span class="ann-badge sent">Sent</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── CALENDAR ── -->
+          <div class="view" id="view-calendar">
+            <div class="two-col">
+              <div class="panel-card">
+                <div class="panel-title">April 2025</div>
+                <div class="mini-cal large">
+                  <div class="cal-grid">
+                    <div class="cl">Sun</div><div class="cl">Mon</div><div class="cl">Tue</div><div class="cl">Wed</div><div class="cl">Thu</div><div class="cl">Fri</div><div class="cl">Sat</div>
+                    <div class="cd other">30</div><div class="cd other">31</div><div class="cd">1</div><div class="cd">2</div><div class="cd">3</div><div class="cd">4</div><div class="cd">5</div>
+                    <div class="cd">6</div><div class="cd">7</div><div class="cd">8</div><div class="cd">9</div><div class="cd">10</div><div class="cd">11</div><div class="cd">12</div>
+                    <div class="cd">13</div><div class="cd">14</div><div class="cd">15</div><div class="cd">16</div><div class="cd">17</div><div class="cd">18</div><div class="cd">19</div>
+                    <div class="cd">20</div><div class="cd">21</div><div class="cd">22</div><div class="cd">23</div><div class="cd today">24</div><div class="cd">25</div><div class="cd">26</div>
+                    <div class="cd">27</div><div class="cd">28</div><div class="cd">29</div><div class="cd">30</div><div class="cd other has-ev">1</div><div class="cd other">2</div><div class="cd other">3</div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div class="panel-card" style="margin-bottom:10px;">
+                  <div class="panel-title">Scheduled events</div>
+                  <div class="ann-item"><div class="ann-icon sched"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg></div><div class="ann-body"><div class="ann-label">Entrance exam announcement</div><div class="ann-meta">May 1 · 8am · auto-fires to 19 parents</div></div><span class="ann-badge sched">7 days</span></div>
+                  <div class="ann-item"><div class="ann-icon sched"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg></div><div class="ann-body"><div class="ann-label">Entrance exam day</div><div class="ann-meta">May 12 · all day</div></div><span class="ann-badge sched">18 days</span></div>
+                </div>
+                <div class="panel-card">
+                  <div class="panel-title">Add event</div>
+                  <div class="form-stack">
+                    <div class="form-row">
+                      <div class="form-field"><label>Date</label><input type="date"></div>
+                      <div class="form-field"><label>Time</label><input type="time"></div>
+                    </div>
+                    <div class="form-field"><label>Label</label><input type="text" placeholder="e.g. Entrance exam"></div>
+                    <button class="btn btn-green" style="width:100%;justify-content:center;">Add to calendar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── MANAGE ADMINS (super admin only) ── -->
+          <div class="view" id="view-manage-admins">
+            <div class="section-hdr">
+              <div class="section-title"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>Admin accounts</div>
+              <button class="btn btn-green"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>Add admin</button>
+            </div>
+            <div class="table-card">
+              <div class="table-wrap">
+                <table>
+                  <colgroup><col style="width:20%"><col style="width:26%"><col style="width:16%"><col style="width:14%"><col style="width:24%"></colgroup>
+                  <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Last active</th><th>Actions</th></tr></thead>
+                  <tbody>
+                    <tr><td><div class="t-name">William A.</div></td><td class="t-sub">w@dgpschools.com</td><td><span class="role-badge super">Super Admin</span></td><td class="t-sub">Now</td><td class="t-sub">Cannot modify</td></tr>
+                    <tr><td><div class="t-name">Mrs. Adebayo</div></td><td class="t-sub">secretary@dgpschools.com</td><td><span class="role-badge admin">Admin</span></td><td class="t-sub">2 days ago</td><td><div class="action-row"><button class="btn btn-outline" style="font-size:10px;padding:3px 9px;">Promote</button><div class="act-btn danger"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></div></div></td></tr>
+                    <tr><td><div class="t-name">Mr. Taiwo</div></td><td class="t-sub">principal@dgpschools.com</td><td><span class="role-badge admin">Admin</span></td><td class="t-sub">5 days ago</td><td><div class="action-row"><button class="btn btn-outline" style="font-size:10px;padding:3px 9px;">Promote</button><div class="act-btn danger"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></div></div></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── ACTIVITY LOG (super admin only) ── -->
+          <div class="view" id="view-activity-log">
+            <div class="section-hdr"><div class="section-title"><svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.95-2.05L6.64 18.36C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9z"/></svg>Activity log</div></div>
+            <div class="table-card">
+              <div class="table-wrap">
+                <table>
+                  <colgroup><col style="width:16%"><col style="width:16%"><col style="width:38%"><col style="width:30%"></colgroup>
+                  <thead><tr><th>Time</th><th>Admin</th><th>Action</th><th>Detail</th></tr></thead>
+                  <tbody>
+                    <tr><td class="t-sub">Today 09:14</td><td><div class="t-name" style="font-size:12px;">William A.</div></td><td>Viewed application</td><td class="t-sub">Amara Okonkwo — TXN-00821</td></tr>
+                    <tr><td class="t-sub">Today 08:52</td><td><div class="t-name" style="font-size:12px;">William A.</div></td><td>Scheduled announcement</td><td class="t-sub">Entrance exam — May 12</td></tr>
+                    <tr><td class="t-sub">Apr 22 16:30</td><td><div class="t-name" style="font-size:12px;">Mrs. Adebayo</div></td><td>Exported CSV</td><td class="t-sub">All applications · 24 records</td></tr>
+                    <tr><td class="t-sub">Apr 21 11:05</td><td><div class="t-name" style="font-size:12px;">William A.</div></td><td>Sent announcement</td><td class="t-sub">Resumption notice · 19 parents</td></tr>
+                    <tr><td class="t-sub">Apr 20 14:18</td><td><div class="t-name" style="font-size:12px;">Mrs. Adebayo</div></td><td>Viewed application</td><td class="t-sub">Tobenna Eze — TXN-00820</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- end content-area -->
+
+        <!-- MOBILE BOTTOM TAB BAR -->
+        <div class="mobile-tabs">
+          <button class="mob-tab active" onclick="navTo('dashboard', this)" data-view="dashboard">
+            <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+            <span>Home</span>
+          </button>
+          <button class="mob-tab" onclick="navTo('applications', this)" data-view="applications">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6z"/></svg>
+            <span>Students</span>
+          </button>
+          <button class="mob-tab" onclick="navTo('ai', this)" data-view="ai">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+            <span>AI</span>
+          </button>
+          <button class="mob-tab" onclick="navTo('announcements', this)" data-view="announcements">
+            <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+            <span>Announce</span>
+          </button>
+          <button class="mob-tab" onclick="navTo('dashboard', this)" data-view="dashboard">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+            <span>Profile</span>
+          </button>
+        </div>
+
+      </div><!-- end main-wrap -->
+    </div><!-- end portal-wrap -->
+  </div><!-- end page-portal -->
+
+  <script src="static/js/admin.js"></script>
+</body>
+</html>
