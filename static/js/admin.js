@@ -184,8 +184,6 @@ async function loadPaymentStats() {
       maximumFractionDigits: 0
     });
 
-    const statPaid = document.getElementById('stat-paid');
-    if (statPaid) statPaid.textContent = total_count;
     const amountEl = document.getElementById('stat-amount');
     if (amountEl) amountEl.textContent = formatted + ' total';
   } catch (err) {
@@ -277,6 +275,17 @@ function updateCounts(data) {
   if (statTotal) statTotal.textContent = total;
   if (statPaid) statPaid.textContent = paid;
   if (statUnpaid) statUnpaid.textContent = unpaid;
+
+  // Calculate how many applications came in this week (Sunday to now)
+  const now = new Date();
+  const startOfWeek = new Date(now);
+  startOfWeek.setDate(now.getDate() - now.getDay());
+  startOfWeek.setHours(0, 0, 0, 0);
+
+  const thisWeek = data.filter(a => new Date(a.created_at) >= startOfWeek).length;
+
+  const appStatSub = document.querySelector('#view-dashboard .stats-grid .stat-card:first-child .stat-sub');
+  if (appStatSub) appStatSub.textContent = thisWeek > 0 ? `+${thisWeek} this week` : 'None this week';
 }
 
 // Filter pill click handler
