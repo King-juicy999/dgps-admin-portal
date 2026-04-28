@@ -170,6 +170,31 @@ async function loadApplications(filter = 'all') {
   }
 }
 
+async function loadPaymentStats() {
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/payment-stats/`);
+    const json = await res.json();
+    if (!json.success) return;
+
+    const { total_amount, total_count } = json.data;
+
+    // Format amount as ₦95,000
+    const formatted = '₦' + total_amount.toLocaleString('en-NG', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    });
+
+    // Update Payments Received stat card (second card)
+    const statCards = document.querySelectorAll('#view-dashboard .stat-card');
+    if (statCards[1]) {
+      statCards[1].querySelector('.stat-value').textContent = total_count;
+      statCards[1].querySelector('.stat-sub').textContent = formatted + ' total';
+    }
+  } catch (err) {
+    console.error('Failed to load payment stats:', err);
+  }
+}
+
 // Render the full applications table
 function renderApplicationsTable(data) {
   const tbody = document.querySelector('#view-applications table tbody');
@@ -250,7 +275,6 @@ function updateCounts(data) {
   // Dashboard stat cards
   const statCards = document.querySelectorAll('#view-dashboard .stat-card');
   if (statCards[0]) statCards[0].querySelector('.stat-value').textContent = total;
-  if (statCards[1]) statCards[1].querySelector('.stat-value').textContent = paid;
   if (statCards[2]) statCards[2].querySelector('.stat-value').textContent = unpaid;
 }
 
@@ -391,4 +415,5 @@ if (_originalNavTo) {
 // Load on page ready if already on applications or dashboard
 document.addEventListener('DOMContentLoaded', function() {
   loadApplications();
+  loadPaymentStats();
 });
