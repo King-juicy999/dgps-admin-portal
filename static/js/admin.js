@@ -295,6 +295,118 @@ function setFilter(filter, pillEl) {
   loadApplications(filter);
 }
 
+function searchApplications(query) {
+  const q = query.toLowerCase().trim();
+  if (!q) {
+    renderApplicationsTable(allApplications);
+    return;
+  }
+  const filtered = allApplications.filter(a =>
+    (a.student || '').toLowerCase().includes(q) ||
+    (a.parent || '').toLowerCase().includes(q) ||
+    (a.reference || '').toLowerCase().includes(q)
+  );
+  renderApplicationsTable(filtered);
+}
+
+function exportCSV(scope) {
+  const data = scope === 'all' ? allApplications : (
+    currentFilter === 'all' ? allApplications :
+    allApplications.filter(a =>
+      scope === 'current'
+        ? (currentFilter === 'paid' ? a.payment_status === 'paid' : a.payment_status !== 'paid')
+        : true
+    )
+  );
+
+  const headers = [
+    'Full Name', 'Date of Birth', 'Age', 'Gender', 'Nationality', 'Class', 'Preferred Contact',
+    'Parent Name', 'Parent Relationship', 'Parent Email', 'Parent Phone', 'Parent Phone 2',
+    'Parent Occupation', 'Parent Workplace', 'Parent Work Address', 'Parent Home Address',
+    'Emergency Contact Name', 'Emergency Contact Phone', 'Emergency Contact Relationship',
+    'Medical Info', 'Payment Reference', 'Amount Paid', 'Payment Status', 'Date Applied'
+  ];
+
+  const rows = data.map(a => [
+    a.full_name || a.student || '',
+    a.date_of_birth || '',
+    a.age || '',
+    a.gender || '',
+    a.nationality || '',
+    a.class_name || '',
+    a.preferred_contact_method || '',
+    a.parent_name || a.parent || '',
+    a.parent_relationship || '',
+    a.parent_email || '',
+    a.parent_phone || '',
+    a.parent_phone_2 || '',
+    a.parent_occupation || '',
+    a.parent_workplace || '',
+    a.parent_work_address || '',
+    a.parent_home_address || '',
+    a.emergency_contact_name || '',
+    a.emergency_contact_phone || '',
+    a.emergency_contact_relationship || '',
+    a.medical_information || '',
+    a.payment_reference || a.reference || '',
+    a.amount_paid || a.amount || '',
+    a.payment_status || '',
+    a.created_at ? new Date(a.created_at).toLocaleDateString('en-GB') : ''
+  ].map(v => `"${String(v).replace(/"/g, '""')}"`));
+
+  const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `DGPS-Applications-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+
+  closeExportDropdown();
+}
+
+function toggleExportDropdown() {
+  let dropdown = document.getElementById('export-dropdown');
+  if (dropdown) {
+    dropdown.remove();
+    return;
+  }
+  const btn = document.querySelector('#view-applications .btn-outline');
+  dropdown = document.createElement('div');
+  dropdown.id = 'export-dropdown';
+  dropdown.style.cssText = `
+    position:absolute; background:#fff; border:1px solid #e0e0e0;
+    border-radius:10px; box-shadow:0 4px 20px rgba(0,0,0,0.12);
+    z-index:200; min-width:200px; overflow:hidden;
+  `;
+  dropdown.innerHTML = `
+    <div onclick="exportCSV('current')" style="padding:12px 16px; cursor:pointer; font-size:0.875rem; color:#0d1a0f; border-bottom:1px solid #f0f0f0;" onmouseover="this.style.background='#f0faf2'" onmouseout="this.style.background=''">
+      Export current view
+    </div>
+    <div onclick="exportCSV('all')" style="padding:12px 16px; cursor:pointer; font-size:0.875rem; color:#0d1a0f;" onmouseover="this.style.background='#f0faf2'" onmouseout="this.style.background=''">
+      Export all applications
+    </div>
+  `;
+  btn.parentElement.style.position = 'relative';
+  btn.parentElement.appendChild(dropdown);
+
+  setTimeout(() => {
+    document.addEventListener('click', closeExportDropdownOutside);
+  }, 0);
+}
+
+function closeExportDropdown() {
+  const dropdown = document.getElementById('export-dropdown');
+  if (dropdown) dropdown.remove();
+  document.removeEventListener('click', closeExportDropdownOutside);
+}
+
+function closeExportDropdownOutside(e) {
+  const dropdown = document.getElementById('export-dropdown');
+  if (dropdown && !dropdown.contains(e.target)) closeExportDropdown();
+}
+
 // View full application in modal
 async function viewApplication(id) {
   const modal = document.getElementById('app-modal');
@@ -426,4 +538,8 @@ if (_originalNavTo) {
 document.addEventListener('DOMContentLoaded', function() {
   loadApplications();
   loadPaymentStats();
+  const searchInput = document.querySelector('.topbar-search');
+  if (searchInput) {
+    searchInput.addEventListener('input', e => searchApplications(e.target.value));
+  }
 });
