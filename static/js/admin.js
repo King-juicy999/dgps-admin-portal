@@ -184,12 +184,10 @@ async function loadPaymentStats() {
       maximumFractionDigits: 0
     });
 
-    // Update Payments Received stat card (second card)
-    const statCards = document.querySelectorAll('#view-dashboard .stat-card');
-    if (statCards[1]) {
-      statCards[1].querySelector('.stat-value').textContent = total_count;
-      statCards[1].querySelector('.stat-sub').textContent = formatted + ' total';
-    }
+    const statPaid = document.getElementById('stat-paid');
+    if (statPaid) statPaid.textContent = total_count;
+    const amountEl = document.getElementById('stat-amount');
+    if (amountEl) amountEl.textContent = formatted + ' total';
   } catch (err) {
     console.error('Failed to load payment stats:', err);
   }
@@ -272,10 +270,13 @@ function updateCounts(data) {
   const badge = document.querySelector('[data-view="applications"] .sb-badge');
   if (badge) badge.textContent = total;
 
-  // Dashboard stat cards
-  const statCards = document.querySelectorAll('#view-dashboard .stat-card');
-  if (statCards[0]) statCards[0].querySelector('.stat-value').textContent = total;
-  if (statCards[2]) statCards[2].querySelector('.stat-value').textContent = unpaid;
+  // Dashboard stat cards — use IDs now
+  const statTotal = document.getElementById('stat-total');
+  const statPaid = document.getElementById('stat-paid');
+  const statUnpaid = document.getElementById('stat-unpaid');
+  if (statTotal) statTotal.textContent = total;
+  if (statPaid) statPaid.textContent = paid;
+  if (statUnpaid) statUnpaid.textContent = unpaid;
 }
 
 // Filter pill click handler
