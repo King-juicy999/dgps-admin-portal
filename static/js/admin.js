@@ -191,6 +191,57 @@ async function loadPaymentStats() {
   }
 }
 
+async function loadPayments() {
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/payments/`);
+    const json = await res.json();
+    if (!json.success) return;
+
+    const { data, meta } = json;
+
+    // Update stat cards
+    const totalEl = document.querySelector('#view-payments .stat-card:nth-child(1) .stat-value');
+    const totalSubEl = document.querySelector('#view-payments .stat-card:nth-child(1) .stat-sub');
+    const lastEl = document.querySelector('#view-payments .stat-card:nth-child(3) .stat-value');
+    const lastSubEl = document.querySelector('#view-payments .stat-card:nth-child(3) .stat-sub');
+
+    if (totalEl) totalEl.textContent = meta.total_collected_display;
+    if (totalSubEl) totalSubEl.textContent = `${meta.total_count} payment${meta.total_count !== 1 ? 's' : ''}`;
+    if (lastEl) lastEl.textContent = meta.last_payment || '—';
+    if (lastSubEl) lastSubEl.textContent = 'most recent';
+
+    // Outstanding — reuse allApplications if already loaded
+    const outstandingEl = document.querySelector('#view-payments .stat-card:nth-child(2) .stat-value');
+    if (outstandingEl && allApplications.length > 0) {
+      const unpaid = allApplications.filter(a => a.payment_status !== 'paid').length;
+      outstandingEl.textContent = unpaid;
+    }
+
+    // Render table
+    const tbody = document.getElementById('payments-tbody');
+    if (!tbody) return;
+
+    if (data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:2rem; color:#999;">No payments yet.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = data.map(p => `
+      <tr>
+        <td><div class="t-name">${p.student_name}</div></td>
+        <td>${p.parent_name}</td>
+        <td><span class="t-ref">${p.reference}</span></td>
+        <td>${p.amount_display}</td>
+        <td class="t-sub">${p.payment_date}</td>
+        <td><span class="role-badge super" style="font-size:10px;">Paid</span></td>
+      </tr>
+    `).join('');
+
+  } catch (err) {
+    console.error('Failed to load payments:', err);
+  }
+}
+
 // Render the full applications table
 function renderApplicationsTable(data) {
   const tbody = document.querySelector('#view-applications table tbody');
@@ -531,6 +582,9 @@ if (_originalNavTo) {
     if (view === 'applications' || view === 'dashboard') {
       loadApplications(currentFilter);
     }
+    if (view === 'payments') {
+      loadPayments();
+    }
   };
 }
 
@@ -538,6 +592,7 @@ if (_originalNavTo) {
 document.addEventListener('DOMContentLoaded', function() {
   loadApplications();
   loadPaymentStats();
+  loadPayments();
   const searchInput = document.querySelector('.topbar-search');
   if (searchInput) {
     searchInput.addEventListener('input', e => searchApplications(e.target.value));
