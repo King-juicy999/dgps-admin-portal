@@ -590,9 +590,21 @@ if (_originalNavTo) {
 
 // Load on page ready if already on applications or dashboard
 document.addEventListener('DOMContentLoaded', function() {
-  loadApplications();
-  loadPaymentStats();
-  loadPayments();
+  // Show loading state immediately
+  const tbodies = document.querySelectorAll('tbody');
+  tbodies.forEach(tb => {
+    tb.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:2rem; color:#999;">Loading...</td></tr>`;
+  });
+
+  // Wake Render, then load all data
+  fetch(`${API_BASE}/`, { method: 'HEAD', mode: 'no-cors' })
+    .catch(() => {})
+    .finally(() => {
+      loadApplications();
+      loadPaymentStats();
+      loadPayments();
+    });
+
   const searchInput = document.querySelector('.topbar-search');
   if (searchInput) {
     searchInput.addEventListener('input', e => searchApplications(e.target.value));
