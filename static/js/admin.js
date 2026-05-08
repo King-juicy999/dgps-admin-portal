@@ -388,10 +388,10 @@ function toggleExportDropdown() {
   dropdown.style.cssText = `
     position:absolute; background:#fff; border:1px solid #e0e0e0;
     border-radius:10px; box-shadow:0 4px 20px rgba(0,0,0,0.12);
-    z-index:200; min-width:220px; overflow:hidden;
+    top:100%; z-index:999; min-width:260px; overflow:visible;
   `;
   dropdown.innerHTML = `
-    <div onclick="openSelectExportModal()" style="padding:12px 16px; cursor:pointer; font-size:0.875rem; color:#0d1a0f; border-bottom:1px solid #f0f0f0;" onmouseover="this.style.background='#f0faf2'" onmouseout="this.style.background=''">
+    <div onclick="openSelectExportModal()" style="padding:12px 16px 8px; cursor:pointer; font-size:0.875rem; color:#0d1a0f; border-bottom:1px solid #f0f0f0;" onmouseover="this.style.background='#f0faf2'" onmouseout="this.style.background=''">
       Export selected applications
     </div>
     <div onclick="exportData('all', 'xlsx')" style="padding:12px 16px; cursor:pointer; font-size:0.875rem; color:#0d1a0f; border-bottom:1px solid #f0f0f0;" onmouseover="this.style.background='#f0faf2'" onmouseout="this.style.background=''">
