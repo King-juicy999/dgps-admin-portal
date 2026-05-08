@@ -259,7 +259,7 @@ function renderApplicationsTable(data) {
 
   tbody.innerHTML = data.map(app => `
     <tr>
-      <td>
+      <td class="row-check">
         <input type="checkbox" class="app-checkbox" data-id="${app.id}"
           style="accent-color:#0a7a24; width:15px; height:15px; cursor:pointer;"
           ${selectedApplicationIds.has(app.id) ? 'checked' : ''}
@@ -282,6 +282,7 @@ function renderApplicationsTable(data) {
       </td>
     </tr>
   `).join('');
+  syncSelectAllApplications();
 }
 
 // Render the dashboard recent applications table (top 3)
@@ -372,8 +373,12 @@ function searchApplications(query) {
 }
 
 function toggleExportDropdown() {
+  const table = document.getElementById('applications-table');
+  if (table) table.classList.toggle('export-mode');
+
   let dropdown = document.getElementById('export-dropdown');
   if (dropdown) {
+    if (table) table.classList.remove('export-mode');
     dropdown.remove();
     return;
   }
@@ -406,6 +411,8 @@ function toggleExportDropdown() {
 function closeExportDropdown() {
   const dropdown = document.getElementById('export-dropdown');
   if (dropdown) dropdown.remove();
+  const table = document.getElementById('applications-table');
+  if (table) table.classList.remove('export-mode');
   document.removeEventListener('click', closeExportDropdownOutside);
 }
 
@@ -550,10 +557,45 @@ function toggleAppSelection(id, checked) {
   } else {
     selectedApplicationIds.delete(id);
   }
+  document.querySelectorAll(`[data-id="${id}"]`).forEach(input => {
+    input.checked = checked;
+  });
+  syncSelectAllApplications();
+}
+
+function toggleAllApplications(checked) {
+  const ids = allApplications.map(app => app.id);
+  if (checked) {
+    ids.forEach(id => selectedApplicationIds.add(id));
+  } else {
+    ids.forEach(id => selectedApplicationIds.delete(id));
+  }
+
+  document.querySelectorAll('.app-checkbox').forEach(input => {
+    input.checked = checked;
+  });
+
+  renderSelectExportList(allApplications);
+  syncSelectAllApplications();
+}
+
+function syncSelectAllApplications() {
+  const selectAll = document.getElementById('select-all-applications');
+  if (!selectAll) return;
+
+  const total = allApplications.length;
+  const selected = allApplications.filter(app => selectedApplicationIds.has(app.id)).length;
+
+  selectAll.checked = total > 0 && selected === total;
+  selectAll.indeterminate = selected > 0 && selected < total;
 }
 
 function openSelectExportModal() {
-  closeExportDropdown();
+  const dropdown = document.getElementById('export-dropdown');
+  if (dropdown) dropdown.remove();
+  document.removeEventListener('click', closeExportDropdownOutside);
+  const table = document.getElementById('applications-table');
+  if (table) table.classList.add('export-mode');
   let modal = document.getElementById('select-export-modal');
   if (!modal) {
     modal = document.createElement('div');
@@ -595,6 +637,8 @@ function openSelectExportModal() {
 function closeSelectExportModal() {
   const modal = document.getElementById('select-export-modal');
   if (modal) modal.style.display = 'none';
+  const table = document.getElementById('applications-table');
+  if (table) table.classList.remove('export-mode');
 }
 
 function renderSelectExportList(data) {

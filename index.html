@@ -252,11 +252,19 @@
             </div>
             <div class="table-card">
               <div class="table-wrap">
-                <table>
-                  <colgroup><col style="width:20%"><col style="width:13%"><col style="width:18%"><col style="width:14%"><col style="width:12%"><col style="width:23%"></colgroup>
-                  <thead><tr><th>Student</th><th>Class</th><th>Parent</th><th>Reference</th><th>Amount</th><th>Actions</th></tr></thead>
+                <table class="app-table" id="applications-table">
+                  <colgroup>
+                    <col class="col-check-width">
+                    <col class="col-student">
+                    <col class="col-class">
+                    <col class="col-parent">
+                    <col class="col-reference">
+                    <col class="col-amount">
+                    <col class="col-actions">
+                  </colgroup>
+                  <thead><tr><th class="col-check"><input type="checkbox" id="select-all-applications" onchange="toggleAllApplications(this.checked)"></th><th>Student</th><th>Class</th><th>Parent</th><th>Reference</th><th>Amount</th><th>Actions</th></tr></thead>
                   <tbody id="applications-tbody">
-                    <tr><td colspan="6" style="text-align:center; padding:2rem; color:#999;">Loading...</td></tr>
+                    <tr><td colspan="7" style="text-align:center; padding:2rem; color:#999;">Loading...</td></tr>
                   </tbody>
                 </table>
               </div>

@@ -163,6 +163,22 @@ th { background: var(--surface); font-size: 9px; font-weight: 600; color: #7a9a8
 td { padding: 9px 12px; border-bottom: 0.5px solid #f0f4f1; font-size: 11px; color: #2a3a2c; vertical-align: middle; }
 tr:last-child td { border-bottom: none; }
 tr:hover td { background: #fafcfa; }
+.app-table .col-check,
+.app-table .row-check { display: none; }
+.app-table.export-mode .col-check,
+.app-table.export-mode .row-check { display: table-cell; }
+.app-table .col-check,
+.app-table .row-check,
+.app-table col.col-check-width { width: 40px; }
+.app-table col.col-student { min-width: 180px; width: 180px; }
+.app-table col.col-class { width: 100px; }
+.app-table col.col-parent { min-width: 160px; width: 160px; }
+.app-table col.col-reference { width: 160px; }
+.app-table col.col-amount { width: 100px; }
+.app-table col.col-actions { width: 80px; }
+.app-table .col-check { text-align: center; padding-left: 8px; padding-right: 8px; }
+.app-table .row-check { text-align: center; padding-left: 8px; padding-right: 8px; }
+.app-table #select-all-applications { accent-color: var(--g); width: 15px; height: 15px; cursor: pointer; }
 .t-name { font-weight: 500; color: var(--ink); font-size: 12px; }
 .t-sub { font-size: 10px; color: #7a9a80; }
 .t-ref { font-family: monospace; font-size: 9px; background: #f0f4f1; padding: 2px 5px; border-radius: 3px; color: #3a5a3c; }
