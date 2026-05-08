@@ -342,6 +342,32 @@ tr:hover td { background: #fafcfa; }
   .ai-sidebar { display: none; }
   .form-row { grid-template-columns: 1fr; }
   .ai-view.active { flex-direction: column; }
+  .app-table thead { display: none; }
+  .app-table tbody tr {
+    display: block;
+    margin-bottom: 12px;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 12px;
+  }
+  .app-table tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border: none;
+    font-size: 0.85rem;
+  }
+  .app-table tbody td::before {
+    content: attr(data-label);
+    font-size: 0.75rem;
+    color: var(--muted, #5a7060);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+    margin-right: 12px;
+  }
+  .app-table .col-check { display: none; }
 }
 
 @media (max-width: 540px) {

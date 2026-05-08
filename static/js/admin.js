@@ -259,18 +259,18 @@ function renderApplicationsTable(data) {
 
   tbody.innerHTML = data.map(app => `
     <tr>
-      <td class="row-check">
+      <td class="row-check" data-label="Select">
         <input type="checkbox" class="app-checkbox" data-id="${app.id}"
           style="accent-color:#0a7a24; width:15px; height:15px; cursor:pointer;"
           ${selectedApplicationIds.has(app.id) ? 'checked' : ''}
           onchange="toggleAppSelection(${app.id}, this.checked)">
       </td>
-      <td><div class="t-name">${app.student}</div></td>
-      <td class="t-sub">${app.class_name}</td>
-      <td>${app.parent}</td>
-      <td><span class="t-ref">${app.reference}</span></td>
-      <td>${app.payment_status === 'paid' ? app.amount : '<span class="unpaid-text">Unpaid</span>'}</td>
-      <td>
+      <td data-label="Student"><div class="t-name">${app.student}</div></td>
+      <td class="t-sub" data-label="Class">${app.class_name}</td>
+      <td data-label="Parent">${app.parent}</td>
+      <td data-label="Reference"><span class="t-ref">${app.reference}</span></td>
+      <td data-label="Amount">${app.payment_status === 'paid' ? app.amount : '<span class="unpaid-text">Unpaid</span>'}</td>
+      <td data-label="Actions">
         <div class="action-row">
           <div class="act-btn" onclick="viewApplication(${app.id})" title="View full application">
             <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
