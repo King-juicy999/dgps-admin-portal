@@ -1,3 +1,8 @@
+const GOOGLE_CLIENT_ID = '802466171345-er0f9b8hdt95j0bi9a8a9rcs3fsv5gk0.apps.googleusercontent.com';
+const GOOGLE_SCOPES = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file';
+let googleAccessToken = null;
+let selectedApplicationIds = new Set();
+
 /* ══════════════════════════════
    DGPS ADMIN PORTAL — JS
 ══════════════════════════════ */
@@ -248,12 +253,18 @@ function renderApplicationsTable(data) {
   if (!tbody) return;
 
   if (data.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:2rem; color:#999;">No applications found.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:2rem; color:#999;">No applications found.</td></tr>`;
     return;
   }
 
   tbody.innerHTML = data.map(app => `
     <tr>
+      <td>
+        <input type="checkbox" class="app-checkbox" data-id="${app.id}"
+          style="accent-color:#0a7a24; width:15px; height:15px; cursor:pointer;"
+          ${selectedApplicationIds.has(app.id) ? 'checked' : ''}
+          onchange="toggleAppSelection(${app.id}, this.checked)">
+      </td>
       <td><div class="t-name">${app.student}</div></td>
       <td class="t-sub">${app.class_name}</td>
       <td>${app.parent}</td>
@@ -360,63 +371,6 @@ function searchApplications(query) {
   renderApplicationsTable(filtered);
 }
 
-function exportCSV(scope) {
-  const data = scope === 'all' ? allApplications : (
-    currentFilter === 'all' ? allApplications :
-    allApplications.filter(a =>
-      scope === 'current'
-        ? (currentFilter === 'paid' ? a.payment_status === 'paid' : a.payment_status !== 'paid')
-        : true
-    )
-  );
-
-  const headers = [
-    'Full Name', 'Date of Birth', 'Age', 'Gender', 'Nationality', 'Class', 'Preferred Contact',
-    'Parent Name', 'Parent Relationship', 'Parent Email', 'Parent Phone', 'Parent Phone 2',
-    'Parent Occupation', 'Parent Workplace', 'Parent Work Address', 'Parent Home Address',
-    'Emergency Contact Name', 'Emergency Contact Phone', 'Emergency Contact Relationship',
-    'Medical Info', 'Payment Reference', 'Amount Paid', 'Payment Status', 'Date Applied'
-  ];
-
-  const rows = data.map(a => [
-    a.full_name || a.student || '',
-    a.date_of_birth || '',
-    a.age || '',
-    a.gender || '',
-    a.nationality || '',
-    a.class_name || '',
-    a.preferred_contact_method || '',
-    a.parent_name || a.parent || '',
-    a.parent_relationship || '',
-    a.parent_email || '',
-    a.parent_phone || '',
-    a.parent_phone_2 || '',
-    a.parent_occupation || '',
-    a.parent_workplace || '',
-    a.parent_work_address || '',
-    a.parent_home_address || '',
-    a.emergency_contact_name || '',
-    a.emergency_contact_phone || '',
-    a.emergency_contact_relationship || '',
-    a.medical_information || '',
-    a.payment_reference || a.reference || '',
-    a.amount_paid || a.amount || '',
-    a.payment_status || '',
-    a.created_at ? new Date(a.created_at).toLocaleDateString('en-GB') : ''
-  ].map(v => `"${String(v).replace(/"/g, '""')}"`));
-
-  const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `DGPS-Applications-${new Date().toISOString().slice(0,10)}.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
-
-  closeExportDropdown();
-}
-
 function toggleExportDropdown() {
   let dropdown = document.getElementById('export-dropdown');
   if (dropdown) {
@@ -429,19 +383,21 @@ function toggleExportDropdown() {
   dropdown.style.cssText = `
     position:absolute; background:#fff; border:1px solid #e0e0e0;
     border-radius:10px; box-shadow:0 4px 20px rgba(0,0,0,0.12);
-    z-index:200; min-width:200px; overflow:hidden;
+    z-index:200; min-width:220px; overflow:hidden;
   `;
   dropdown.innerHTML = `
-    <div onclick="exportCSV('current')" style="padding:12px 16px; cursor:pointer; font-size:0.875rem; color:#0d1a0f; border-bottom:1px solid #f0f0f0;" onmouseover="this.style.background='#f0faf2'" onmouseout="this.style.background=''">
-      Export current view
+    <div onclick="openSelectExportModal()" style="padding:12px 16px; cursor:pointer; font-size:0.875rem; color:#0d1a0f; border-bottom:1px solid #f0f0f0;" onmouseover="this.style.background='#f0faf2'" onmouseout="this.style.background=''">
+      Export selected applications
     </div>
-    <div onclick="exportCSV('all')" style="padding:12px 16px; cursor:pointer; font-size:0.875rem; color:#0d1a0f;" onmouseover="this.style.background='#f0faf2'" onmouseout="this.style.background=''">
-      Export all applications
+    <div onclick="exportData('all', 'xlsx')" style="padding:12px 16px; cursor:pointer; font-size:0.875rem; color:#0d1a0f; border-bottom:1px solid #f0f0f0;" onmouseover="this.style.background='#f0faf2'" onmouseout="this.style.background=''">
+      Export all — Download Excel
+    </div>
+    <div onclick="exportData('all', 'sheets')" style="padding:12px 16px; cursor:pointer; font-size:0.875rem; color:#0d1a0f;" onmouseover="this.style.background='#f0faf2'" onmouseout="this.style.background=''">
+      Export all — Google Sheets
     </div>
   `;
   btn.parentElement.style.position = 'relative';
   btn.parentElement.appendChild(dropdown);
-
   setTimeout(() => {
     document.addEventListener('click', closeExportDropdownOutside);
   }, 0);
@@ -586,6 +542,236 @@ if (_originalNavTo) {
       loadPayments();
     }
   };
+}
+
+function toggleAppSelection(id, checked) {
+  if (checked) {
+    selectedApplicationIds.add(id);
+  } else {
+    selectedApplicationIds.delete(id);
+  }
+}
+
+function openSelectExportModal() {
+  closeExportDropdown();
+  let modal = document.getElementById('select-export-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'select-export-modal';
+    modal.style.cssText = `
+      position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:1000;
+      display:flex; align-items:center; justify-content:center;
+    `;
+    modal.innerHTML = `
+      <div style="background:#fff; border-radius:16px; padding:1.5rem; width:90%; max-width:500px; max-height:80vh; display:flex; flex-direction:column; gap:1rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <h3 style="font-size:1rem; color:#0a7a24; margin:0;">Select Applications to Export</h3>
+          <div onclick="closeSelectExportModal()" style="cursor:pointer; font-size:1.2rem; color:#999;">✕</div>
+        </div>
+        <input id="select-export-search" type="text" placeholder="Search by name, parent or reference..."
+          style="border:1px solid #e0e0e0; border-radius:8px; padding:10px 12px; font-size:0.875rem; outline:none; width:100%; box-sizing:border-box;"
+          oninput="filterSelectExportList(this.value)">
+        <div id="select-export-list" style="overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:6px;">
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button onclick="exportData('selected', 'xlsx')"
+            style="flex:1; padding:10px; background:#0a7a24; color:#fff; border:none; border-radius:8px; font-size:0.875rem; cursor:pointer; min-width:140px;">
+            Download Excel
+          </button>
+          <button onclick="exportData('selected', 'sheets')"
+            style="flex:1; padding:10px; background:#fff; color:#0a7a24; border:2px solid #0a7a24; border-radius:8px; font-size:0.875rem; cursor:pointer; min-width:140px;">
+            Export to Google Sheets
+          </button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', e => { if (e.target === modal) closeSelectExportModal(); });
+  }
+  renderSelectExportList(allApplications);
+  modal.style.display = 'flex';
+}
+
+function closeSelectExportModal() {
+  const modal = document.getElementById('select-export-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function renderSelectExportList(data) {
+  const list = document.getElementById('select-export-list');
+  if (!list) return;
+  if (data.length === 0) {
+    list.innerHTML = `<p style="text-align:center; color:#999; font-size:0.875rem;">No applications found.</p>`;
+    return;
+  }
+  list.innerHTML = data.map(app => `
+    <label style="display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid #f0f0f0; border-radius:8px; cursor:pointer; font-size:0.875rem;">
+      <input type="checkbox" data-id="${app.id}" style="accent-color:#0a7a24; width:15px; height:15px;"
+        ${selectedApplicationIds.has(app.id) ? 'checked' : ''}
+        onchange="toggleAppSelection(${app.id}, this.checked)">
+      <div>
+        <div style="font-weight:600; color:#0d1a0f;">${app.student}</div>
+        <div style="color:#999; font-size:0.75rem;">${app.class_name} · ${app.parent} · ${app.reference}</div>
+      </div>
+    </label>
+  `).join('');
+}
+
+function filterSelectExportList(val) {
+  const q = val.toLowerCase().trim();
+  const filtered = q
+    ? allApplications.filter(a =>
+        (a.student || '').toLowerCase().includes(q) ||
+        (a.parent || '').toLowerCase().includes(q) ||
+        (a.reference || '').toLowerCase().includes(q))
+    : allApplications;
+  renderSelectExportList(filtered);
+}
+
+function buildExportRows(data) {
+  const headers = [
+    'Full Name', 'Date of Birth', 'Age', 'Gender', 'Nationality', 'Class',
+    'Preferred Contact', 'Parent Name', 'Parent Relationship', 'Parent Email',
+    'Parent Phone', 'Parent Phone 2', 'Parent Occupation', 'Parent Workplace',
+    'Parent Work Address', 'Parent Home Address', 'Emergency Contact Name',
+    'Emergency Contact Phone', 'Emergency Contact Relationship', 'Medical Info',
+    'Payment Reference', 'Amount Paid', 'Payment Status', 'Date Applied'
+  ];
+  const rows = data.map(a => [
+    a.full_name || a.student || '',
+    a.date_of_birth || '',
+    a.age || '',
+    a.gender || '',
+    a.nationality || '',
+    a.class_name || '',
+    a.preferred_contact_method || '',
+    a.parent_name || a.parent || '',
+    a.parent_relationship || '',
+    a.parent_email || '',
+    a.parent_phone || '',
+    a.parent_phone_2 || '',
+    a.parent_occupation || '',
+    a.parent_workplace || '',
+    a.parent_work_address || '',
+    a.parent_home_address || '',
+    a.emergency_contact_name || '',
+    a.emergency_contact_phone || '',
+    a.emergency_contact_relationship || '',
+    a.medical_information || '',
+    a.payment_reference || a.reference || '',
+    a.amount_paid || a.amount || '',
+    a.payment_status || '',
+    a.created_at ? new Date(a.created_at).toLocaleDateString('en-GB') : ''
+  ]);
+  return [headers, ...rows];
+}
+
+function exportData(scope, format) {
+  let data = [];
+  if (scope === 'selected') {
+    if (selectedApplicationIds.size === 0) {
+      alert('Please select at least one application first.');
+      return;
+    }
+    data = allApplications.filter(a => selectedApplicationIds.has(a.id));
+  } else {
+    data = allApplications;
+  }
+
+  const rows = buildExportRows(data);
+
+  if (format === 'xlsx') {
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    const range = XLSX.utils.decode_range(ws['!ref']);
+    for (let C = range.s.c; C <= range.e.c; C++) {
+      const cell = ws[XLSX.utils.encode_cell({ r: 0, c: C })];
+      if (cell) cell.s = { font: { bold: true } };
+    }
+    ws['!cols'] = rows[0].map((_, i) => ({
+      wch: Math.max(...rows.map(r => String(r[i] || '').length), 10)
+    }));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Applications');
+    XLSX.writeFile(wb, `DGPS-Applications-${new Date().toISOString().slice(0,10)}.xlsx`);
+    closeSelectExportModal();
+    closeExportDropdown();
+  } else if (format === 'sheets') {
+    googleSignInThenExport(rows);
+  }
+}
+
+function googleSignInThenExport(rows) {
+  const client = google.accounts.oauth2.initTokenClient({
+    client_id: GOOGLE_CLIENT_ID,
+    scope: GOOGLE_SCOPES,
+    callback: (response) => {
+      if (response.error) {
+        alert('Google sign-in failed. Please try again.');
+        return;
+      }
+      googleAccessToken = response.access_token;
+      createGoogleSheet(rows);
+    }
+  });
+  client.requestAccessToken();
+}
+
+async function createGoogleSheet(rows) {
+  const title = `DGPS Applications — ${new Date().toLocaleDateString('en-GB')}`;
+
+  try {
+    const createRes = await fetch('https://sheets.googleapis.com/v4/spreadsheets', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${googleAccessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ properties: { title } })
+    });
+    const sheet = await createRes.json();
+    const spreadsheetId = sheet.spreadsheetId;
+
+    await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/A1:Z${rows.length}?valueInputOption=RAW`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${googleAccessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ values: rows })
+    });
+
+    await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}:batchUpdate`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${googleAccessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        requests: [
+          {
+            repeatCell: {
+              range: { sheetId: 0, startRowIndex: 0, endRowIndex: 1 },
+              cell: { userEnteredFormat: { textFormat: { bold: true }, backgroundColor: { red: 0.04, green: 0.48, blue: 0.14 } } },
+              fields: 'userEnteredFormat(textFormat,backgroundColor)'
+            }
+          },
+          {
+            updateSheetProperties: {
+              properties: { sheetId: 0, gridProperties: { frozenRowCount: 1 } },
+              fields: 'gridProperties.frozenRowCount'
+            }
+          }
+        ]
+      })
+    });
+
+    window.open(`https://docs.google.com/spreadsheets/d/${spreadsheetId}`, '_blank');
+    closeSelectExportModal();
+    closeExportDropdown();
+  } catch (err) {
+    console.error('Google Sheets export failed:', err);
+    alert('Failed to export to Google Sheets. Please try again.');
+  }
 }
 
 // Load on page ready if already on applications or dashboard
