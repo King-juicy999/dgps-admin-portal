@@ -103,6 +103,22 @@ function closeSidebar() {
 }
 
 /* ── AI ASSISTANT ── */
+let allParents = [];
+
+async function loadParents() {
+  try {
+    const res = await fetch('https://dgps-website.onrender.com/api/admin/parents/');
+    const data = await res.json();
+    if (data.success) {
+      allParents = data.parents;
+      const notice = document.getElementById('ai-all-notice');
+      if (notice) notice.textContent = `Message will be sent to all ${data.parents.length} parents in the database.`;
+    }
+  } catch (e) {
+    console.warn('Could not load parents:', e);
+  }
+}
+
 function toggleRcptTab(el, mode) {
   document.querySelectorAll('.ai-rcpt-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
@@ -127,12 +143,38 @@ function addRecipient(name, contact) {
   document.querySelector('.ai-search-input').value = '';
 }
 
-function filterRecipients(val) {
-  const items = document.querySelectorAll('.ai-dropdown-item');
-  items.forEach(item => {
-    const text = item.textContent.toLowerCase();
-    item.style.display = text.includes(val.toLowerCase()) ? '' : 'none';
-  });
+function filterRecipients(query) {
+  const dropdown = document.getElementById('ai-dropdown');
+  if (!dropdown) return;
+  const q = query.trim().toLowerCase();
+  if (!q) { dropdown.style.display = 'none'; return; }
+
+  const matches = allParents.filter(p =>
+    p.name.toLowerCase().includes(q) ||
+    p.email.toLowerCase().includes(q) ||
+    p.phone.includes(q) ||
+    (p.phone_2 && p.phone_2.includes(q))
+  );
+
+  dropdown.innerHTML = '';
+  if (matches.length === 0) {
+    dropdown.innerHTML = '<div class="ai-dropdown-add"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg> No match — add manually</div>';
+  } else {
+    matches.slice(0, 6).forEach(p => {
+      const initials = p.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+      const phones = [p.phone, p.phone_2].filter(Boolean).join(' · ');
+      const item = document.createElement('div');
+      item.className = 'ai-dropdown-item';
+      item.innerHTML = `<div class="ai-rcpt-av">${initials}</div><div><div class="ai-rcpt-name">${p.name}</div><div class="ai-rcpt-contact">${p.email}${phones ? ' · ' + phones : ''}</div></div>`;
+      item.onclick = () => addRecipient(p.name, p.email);
+      dropdown.appendChild(item);
+    });
+    const addRow = document.createElement('div');
+    addRow.className = 'ai-dropdown-add';
+    addRow.innerHTML = '<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg> Add email or phone not in database';
+    dropdown.appendChild(addRow);
+  }
+  dropdown.style.display = 'block';
 }
 
 /* ── ENTER KEY ON LOGIN ── */
@@ -833,6 +875,7 @@ document.addEventListener('DOMContentLoaded', function() {
       loadApplications();
       loadPaymentStats();
       loadPayments();
+      loadParents();
     });
 
   const searchInput = document.querySelector('.topbar-search');

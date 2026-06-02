@@ -379,28 +379,11 @@
                         <div class="ai-chip">+234 803 000 1122 <svg onclick="removeChip(this)" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></div>
                       </div>
                       <input class="ai-search-input" type="text" placeholder="Search parent name, or type email / phone number…" oninput="filterRecipients(this.value)">
-                      <div class="ai-dropdown" id="ai-dropdown">
-                        <div class="ai-dropdown-item" onclick="addRecipient('Mrs. Nwosu', 'chidera.nwosu@gmail.com')">
-                          <div class="ai-rcpt-av">NO</div>
-                          <div><div class="ai-rcpt-name">Mrs. Nwosu</div><div class="ai-rcpt-contact">chidera.nwosu@gmail.com · +234 810 000 5566</div></div>
-                        </div>
-                        <div class="ai-dropdown-item" onclick="addRecipient('Mr. Eze', 'tobenna.eze@yahoo.com')">
-                          <div class="ai-rcpt-av">EZ</div>
-                          <div><div class="ai-rcpt-name">Mr. Eze</div><div class="ai-rcpt-contact">tobenna.eze@yahoo.com · +234 703 000 8877</div></div>
-                        </div>
-                        <div class="ai-dropdown-item" onclick="addRecipient('Dr. Adeyemi', 'dr.adeyemi@gmail.com')">
-                          <div class="ai-rcpt-av">AD</div>
-                          <div><div class="ai-rcpt-name">Dr. Adeyemi</div><div class="ai-rcpt-contact">dr.adeyemi@gmail.com · +234 901 000 2233</div></div>
-                        </div>
-                        <div class="ai-dropdown-add">
-                          <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                          Add email or phone not in database
-                        </div>
-                      </div>
+                      <div class="ai-dropdown" id="ai-dropdown" style="display:none;"></div>
                     </div>
 
                     <div id="rcpt-all" style="display:none;">
-                      <div class="ai-all-notice">Message will be sent to all 19 parents in the database.</div>
+                      <div class="ai-all-notice" id="ai-all-notice">Message will be sent to all parents in the database.</div>
                     </div>
 
                     <div class="ai-channel-label">Send via</div>
