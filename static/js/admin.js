@@ -79,7 +79,7 @@ function navTo(viewId, triggerEl) {
     dashboard: 'Dashboard',
     applications: 'Applications',
     payments: 'Payments',
-    ai: 'DGPS AI assistant',
+    ai: 'Assistant',
     announcements: 'Announcements',
     calendar: 'Calendar',
     'manage-admins': 'Manage admins',
@@ -177,45 +177,32 @@ function filterRecipients(query) {
   dropdown.style.display = 'block';
 }
 
-async function generateDraft() {
-  const instructionEl = document.querySelector('.ai-prompt-input');
-  const subjectEl = document.querySelector('.ai-subject-value');
-  const bodyEl = document.querySelector('.ai-message-body');
-  const btn = document.querySelector('.ai-prompt-actions .btn-green');
+function newMessage() {
+  document.getElementById('ai-compose-panel').style.display = 'flex';
+  document.getElementById('ai-empty-panel').style.display = 'none';
+  document.getElementById('compose-subject').value = '';
+  document.getElementById('compose-body').value = '';
+  document.getElementById('ai-chips').innerHTML = '';
+  document.getElementById('ai-dropdown').style.display = 'none';
+  document.getElementById('ai-compose-title').textContent = 'New message';
+  const tabs = document.querySelectorAll('.ai-rcpt-tab');
+  tabs.forEach(t => t.classList.remove('active'));
+  tabs[1].classList.add('active');
+  document.getElementById('rcpt-specific').style.display = 'block';
+  document.getElementById('rcpt-all').style.display = 'none';
+}
 
-  if (!instructionEl || !subjectEl || !bodyEl) return;
+function saveDraft() {
+  const subject = document.getElementById('compose-subject').value.trim();
+  if (!subject) { alert('Please enter a subject before saving.'); return; }
+  alert('Draft saved.');
+}
 
-  const instruction = instructionEl.value.trim();
-  if (!instruction) {
-    alert('Please enter an instruction first.');
-    return;
-  }
-
-  btn.textContent = 'Generating…';
-  btn.disabled = true;
-
-  try {
-    const res = await fetch('https://dgps-website.onrender.com/api/admin/ai-draft/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ instruction })
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-      subjectEl.textContent = data.subject;
-      bodyEl.innerHTML = data.body.replace(/\n/g, '<br>');
-    } else {
-      alert('Could not generate draft: ' + (data.error || 'Unknown error'));
-    }
-  } catch (e) {
-    alert('Request failed. Check your connection.');
-    console.error(e);
-  } finally {
-    btn.textContent = 'Generate draft';
-    btn.disabled = false;
-  }
+function sendMessage() {
+  const subject = document.getElementById('compose-subject').value.trim();
+  const body = document.getElementById('compose-body').value.trim();
+  if (!subject || !body) { alert('Please fill in both subject and message before sending.'); return; }
+  alert('Send functionality coming soon.');
 }
 
 /* ── ENTER KEY ON LOGIN ── */
