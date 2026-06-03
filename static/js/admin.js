@@ -205,6 +205,8 @@ function saveDraft() {
   alert('Draft saved.');
 }
 
+const BACKEND_URL = window.BACKEND_URL;
+
 async function sendMessage() {
   const subject = document.getElementById('compose-subject').value.trim();
   const body = document.getElementById('compose-body').value.trim();
@@ -239,7 +241,7 @@ async function sendMessage() {
   sendBtn.disabled = true;
 
   try {
-    const res = await fetch(`${window.BACKEND_URL}/api/admin/send-message/`, {
+    const res = await fetch(`${BACKEND_URL}/api/admin/send-message/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
