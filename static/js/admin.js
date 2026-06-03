@@ -134,12 +134,19 @@ function removeChip(svgEl) {
   svgEl.closest('.ai-chip').remove();
 }
 
-function addRecipient(name, contact) {
+function addRecipient(name, email) {
   const chips = document.getElementById('ai-chips');
+  const existing = Array.from(chips.querySelectorAll('.ai-chip')).map(c => c.dataset.email);
+  if (existing.includes(email)) return;
+
   const chip = document.createElement('div');
   chip.className = 'ai-chip';
+  chip.dataset.email = email;
+  chip.dataset.name = name;
   chip.innerHTML = `${name} <svg onclick="removeChip(this)" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>`;
   chips.appendChild(chip);
+
+  document.getElementById('ai-dropdown').style.display = 'none';
   document.querySelector('.ai-search-input').value = '';
 }
 
@@ -198,11 +205,67 @@ function saveDraft() {
   alert('Draft saved.');
 }
 
-function sendMessage() {
+async function sendMessage() {
   const subject = document.getElementById('compose-subject').value.trim();
   const body = document.getElementById('compose-body').value.trim();
-  if (!subject || !body) { alert('Please fill in both subject and message before sending.'); return; }
-  alert('Send functionality coming soon.');
+
+  if (!subject || !body) {
+    alert('Please fill in both subject and message before sending.');
+    return;
+  }
+
+  const sendToAll = document.getElementById('rcpt-all').style.display !== 'none';
+  const chips = document.querySelectorAll('#ai-chips .ai-chip');
+  const recipients = [];
+
+  if (!sendToAll && chips.length === 0) {
+    alert('Please add at least one recipient or choose Send to all.');
+    return;
+  }
+
+  chips.forEach(chip => {
+    const email = chip.dataset.email;
+    const name = chip.dataset.name;
+    if (email) recipients.push({ name, email });
+  });
+
+  const activeChannels = [];
+  document.querySelectorAll('.ai-channel.active').forEach(ch => {
+    activeChannels.push(ch.textContent.trim().toLowerCase());
+  });
+
+  const sendBtn = document.querySelector('.ai-footer .btn-green');
+  sendBtn.textContent = 'Sending…';
+  sendBtn.disabled = true;
+
+  try {
+    const res = await fetch(`${window.BACKEND_URL}/api/admin/send-message/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        subject,
+        body,
+        send_to_all: sendToAll,
+        recipients,
+        channels: activeChannels
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      alert(`Message sent successfully to ${data.sent} parent(s).`);
+      newMessage();
+    } else {
+      alert('Failed to send: ' + (data.error || 'Unknown error'));
+    }
+  } catch (e) {
+    alert('Request failed. Check your connection.');
+    console.error(e);
+  } finally {
+    sendBtn.textContent = 'Send now';
+    sendBtn.disabled = false;
+  }
 }
 
 /* ── ENTER KEY ON LOGIN ── */
