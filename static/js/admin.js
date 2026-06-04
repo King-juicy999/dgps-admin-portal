@@ -31,6 +31,7 @@ function doLogin() {
   currentUser = user;
   applyRole(user);
   showPage('portal');
+  loadParents();
 }
 
 function doLogout() {
@@ -114,9 +115,11 @@ async function loadParents() {
       allParents = data.parents;
       const notice = document.getElementById('ai-all-notice');
       if (notice) notice.textContent = `Message will be sent to all ${data.parents.length} parents in the database.`;
+    } else {
+      console.warn('loadParents: API returned success=false', data);
     }
   } catch (e) {
-    console.warn('Could not load parents:', e);
+    console.warn('loadParents failed:', e);
   }
 }
 
@@ -967,7 +970,6 @@ document.addEventListener('DOMContentLoaded', function() {
       loadApplications();
       loadPaymentStats();
       loadPayments();
-      loadParents();
     });
 
   const searchInput = document.querySelector('.topbar-search');
