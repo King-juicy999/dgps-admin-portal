@@ -327,47 +327,11 @@ tr:hover td { background: #fafcfa; }
    RESPONSIVE — MOBILE
 ══════════════════════════════ */
 @media (max-width: 900px) {
-  .sidebar { position: fixed; top: 0; left: 0; bottom: 0; transform: translateX(-100%); z-index: 200; }
-  .sidebar.open { transform: translateX(0); }
-  .sb-overlay.open { display: block; }
-  .topbar-hamburger { display: flex; }
-  .topbar-search { width: 120px; }
-  .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .stats-grid.three-col { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .two-col { grid-template-columns: 1fr; }
-  .mobile-tabs { display: flex; }
-  .content-area { padding-bottom: calc(var(--mobile-tabs-h) + 8px); }
-  .login-left { display: none; }
-  .login-right { padding: 32px 24px; }
   .ai-sidebar { display: none; }
-  .form-row { grid-template-columns: 1fr; }
   .ai-view.active { flex-direction: column; }
-  .app-table thead { display: none; }
-  .app-table tbody tr {
-    display: block;
-    margin-bottom: 12px;
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 10px;
-    padding: 12px;
-  }
-  .app-table tbody td {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 6px 0;
-    border: none;
-    font-size: 0.85rem;
-  }
-  .app-table tbody td::before {
-    content: attr(data-label);
-    font-size: 0.75rem;
-    color: var(--muted, #5a7060);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    flex-shrink: 0;
-    margin-right: 12px;
-  }
-  .app-table .col-check { display: none; }
+  .ai-main { display: flex !important; }
+  #ai-empty-panel { display: none !important; }
+  #ai-compose-panel { display: flex !important; flex-direction: column; height: 100%; }
 }
 
 @media (max-width: 540px) {

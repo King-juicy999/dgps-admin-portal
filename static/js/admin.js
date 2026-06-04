@@ -259,6 +259,32 @@ async function sendMessage() {
 
     if (data.success) {
       alert(`Message sent successfully to ${data.sent} parent(s).`);
+
+      const result = data;
+      // Add to recent history
+      const histList = document.getElementById('ai-history-empty');
+      const histContainer = histList ? histList.parentElement : null;
+      if (histContainer) {
+        // Remove empty state
+        const emptyEl = document.getElementById('ai-history-empty');
+        if (emptyEl) emptyEl.style.display = 'none';
+
+        // Create history item
+        const item = document.createElement('div');
+        item.className = 'ai-hist-item';
+        const subject = document.getElementById('compose-subject').value || 'No subject';
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        item.innerHTML = `
+          <div class="ai-hist-title">${subject}</div>
+          <div class="ai-hist-meta">Sent · ${timeStr} · ${result.sent} recipient${result.sent !== 1 ? 's' : ''}</div>
+        `;
+        // Insert after the label
+        const label = histContainer.querySelector('.ai-hist-label');
+        if (label) label.after(item);
+        else histContainer.prepend(item);
+      }
+
       newMessage();
     } else {
       alert('Failed to send: ' + (data.error || 'Unknown error'));
