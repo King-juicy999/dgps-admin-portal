@@ -327,11 +327,26 @@ tr:hover td { background: #fafcfa; }
    RESPONSIVE — MOBILE
 ══════════════════════════════ */
 @media (max-width: 900px) {
-  .ai-sidebar { display: none; }
   .ai-view.active { flex-direction: column; }
-  .ai-main { display: flex !important; }
+  .ai-shell { flex-direction: column; }
+  .ai-sidebar { display: none !important; }
+  .ai-main { display: flex !important; width: 100%; }
   #ai-empty-panel { display: none !important; }
-  #ai-compose-panel { display: flex !important; flex-direction: column; height: 100%; }
+  #ai-compose-panel { 
+    display: flex !important; 
+    flex-direction: column; 
+    width: 100%;
+    height: calc(100vh - var(--topbar-h) - var(--mobile-tabs-h));
+  }
+  .ai-body { 
+    flex: 1; 
+    overflow-y: auto; 
+  }
+  .ai-footer {
+    position: sticky;
+    bottom: 0;
+    background: #fff;
+  }
 }
 
 @media (max-width: 540px) {
