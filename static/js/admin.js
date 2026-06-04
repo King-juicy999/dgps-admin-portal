@@ -97,6 +97,14 @@ function navTo(viewId, triggerEl) {
   }
 
   closeSidebar();
+
+  // Reset assistant panels when navigating away from ai view
+  if (viewId !== 'ai' && window.innerWidth <= 900) {
+    const empty = document.getElementById('ai-empty-panel');
+    const compose = document.getElementById('ai-compose-panel');
+    if (empty) empty.classList.remove('mobile-hidden');
+    if (compose) compose.classList.remove('mobile-open');
+  }
 }
 
 /* ── MOBILE SIDEBAR ── */
@@ -195,10 +203,9 @@ function filterRecipients(query) {
 }
 
 function newMessage() {
-  // On mobile, ensure compose panel is visible
   if (window.innerWidth <= 900) {
-    document.getElementById('ai-empty-panel').style.display = 'none';
-    document.getElementById('ai-compose-panel').style.display = 'flex';
+    document.getElementById('ai-empty-panel').classList.add('mobile-hidden');
+    document.getElementById('ai-compose-panel').classList.add('mobile-open');
   }
   document.getElementById('ai-compose-panel').style.display = 'flex';
   document.getElementById('ai-empty-panel').style.display = 'none';

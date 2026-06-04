@@ -342,19 +342,46 @@ tr:hover td { background: #fafcfa; }
    RESPONSIVE — MOBILE
 ══════════════════════════════ */
 @media (max-width: 900px) {
+  /* ── LOGIN ── */
   .login-left { display: none; }
   .login-right { width: 100%; padding: 40px 24px; }
   .login-form-wrap { max-width: 360px; margin: 0 auto; }
 
-  .ai-shell { flex-direction: column; height: calc(100vh - var(--topbar-h) - var(--mobile-tabs-h)); }
-  .ai-sidebar { display: none !important; }
+  /* ── SIDEBAR: hamburger slide-in ── */
+  .sidebar { position: fixed; top: 0; left: 0; bottom: 0; transform: translateX(-100%); z-index: 200; }
+  .sidebar.open { transform: translateX(0); }
+  .sb-overlay.open { display: block; }
+  .topbar-hamburger { display: flex; }
+  .topbar-search { width: 120px; }
+
+  /* ── GENERAL LAYOUT ── */
+  .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stats-grid.three-col { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .two-col { grid-template-columns: 1fr; }
+  .mobile-tabs { display: flex; }
+  .content-area { padding-bottom: calc(var(--mobile-tabs-h) + 8px); }
+  .form-row { grid-template-columns: 1fr; }
+
+  /* ── APPLICATIONS TABLE: card layout ── */
+  .app-table thead { display: none; }
+  .app-table tbody tr { display: block; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
+  .app-table tbody td { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border: none; font-size: 0.85rem; }
+  .app-table tbody td::before { content: attr(data-label); font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; flex-shrink: 0; margin-right: 12px; }
+  .app-table .col-check { display: none; }
+
+  /* ── ASSISTANT ── */
   .ai-view { padding: 0 !important; overflow: hidden; }
   .ai-view.active { display: flex; flex-direction: column; height: calc(100vh - var(--topbar-h) - var(--mobile-tabs-h)); }
-  #ai-empty-panel { display: none !important; }
-  #ai-compose-panel { display: flex !important; flex-direction: column; flex: 1; width: 100%; overflow: hidden; }
+  .ai-shell { flex-direction: column; width: 100%; height: 100%; overflow: hidden; }
+  .ai-sidebar { display: none !important; }
+  #ai-empty-panel { display: flex !important; flex: 1; align-items: center; justify-content: center; flex-direction: column; gap: 1rem; color: #999; }
+  #ai-compose-panel { display: none !important; flex-direction: column; flex: 1; width: 100%; overflow: hidden; }
+  #ai-compose-panel.mobile-open { display: flex !important; }
+  #ai-empty-panel.mobile-hidden { display: none !important; }
   .ai-body { flex: 1; overflow-y: auto; padding: 12px 14px; }
   .ai-footer { flex-shrink: 0; background: #fff; border-top: 0.5px solid var(--border); padding: 10px 14px; }
   .ai-main-top { flex-shrink: 0; }
+  .ai-main { flex: 1; min-width: 0; overflow: hidden; }
 }
 
 @media (max-width: 540px) {
