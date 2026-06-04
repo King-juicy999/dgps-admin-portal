@@ -364,10 +364,39 @@ tr:hover td { background: #fafcfa; }
 
   /* ── APPLICATIONS TABLE: card layout ── */
   .app-table thead { display: none; }
-  .app-table tbody tr { display: block; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
-  .app-table tbody td { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border: none; font-size: 0.85rem; }
-  .app-table tbody td::before { content: attr(data-label); font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; flex-shrink: 0; margin-right: 12px; }
-  .app-table .col-check { display: none; }
+  .app-table tbody tr {
+    display: block;
+    margin-bottom: 12px;
+    background: #fff;
+    border: 0.5px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .app-table tbody td {
+    display: block;
+    padding: 4px 0;
+    border: none;
+    font-size: 12px;
+    color: var(--ink);
+  }
+  .app-table tbody td::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 2px;
+  }
+  .app-table tbody td + td {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 0.5px solid #f0f4f1;
+  }
+  .app-table tbody td:first-child { display: none; }
+  .app-table tbody td:last-child { border-top: 0.5px solid #f0f4f1; margin-top: 10px; padding-top: 10px; }
 
   /* ── ASSISTANT ── */
   .ai-view { padding: 0 !important; overflow: hidden; }
