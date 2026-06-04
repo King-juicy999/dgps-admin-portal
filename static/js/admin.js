@@ -1,3 +1,4 @@
+const BACKEND_URL = window.DGPS_CONFIG.BACKEND_URL;
 const GOOGLE_CLIENT_ID = '802466171345-er0f9b8hdt95j0bi9a8a9rcs3fsv5gk0.apps.googleusercontent.com';
 const GOOGLE_SCOPES = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file';
 let googleAccessToken = null;
@@ -107,7 +108,7 @@ let allParents = [];
 
 async function loadParents() {
   try {
-    const res = await fetch('https://dgps-website.onrender.com/api/admin/parents/');
+    const res = await fetch(`${BACKEND_URL}/api/admin/parents/`);
     const data = await res.json();
     if (data.success) {
       allParents = data.parents;
@@ -205,8 +206,6 @@ function saveDraft() {
   alert('Draft saved.');
 }
 
-const BACKEND_URL = window.BACKEND_URL;
-
 async function sendMessage() {
   const subject = document.getElementById('compose-subject').value.trim();
   const body = document.getElementById('compose-body').value.trim();
@@ -284,7 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // APPLICATIONS — API Integration
 // ─────────────────────────────────────────
 
-const API_BASE = 'https://dgps-website.onrender.com';
+const API_BASE = BACKEND_URL;
 let currentFilter = 'all';
 let allApplications = [];
 
