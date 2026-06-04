@@ -90,6 +90,12 @@ function navTo(viewId, triggerEl) {
   const titleEl = document.getElementById('topbar-title');
   if (titleEl) titleEl.textContent = titles[viewId] || viewId;
 
+  // Show compose button only on AI view on mobile
+  const mobileBtn = document.getElementById('ai-mobile-compose-btn');
+  if (mobileBtn) {
+    mobileBtn.style.display = (viewId === 'ai' && window.innerWidth <= 900) ? 'flex' : 'none';
+  }
+
   closeSidebar();
 }
 
@@ -189,6 +195,11 @@ function filterRecipients(query) {
 }
 
 function newMessage() {
+  // On mobile, ensure compose panel is visible
+  if (window.innerWidth <= 900) {
+    document.getElementById('ai-empty-panel').style.display = 'none';
+    document.getElementById('ai-compose-panel').style.display = 'flex';
+  }
   document.getElementById('ai-compose-panel').style.display = 'flex';
   document.getElementById('ai-empty-panel').style.display = 'none';
   document.getElementById('compose-subject').value = '';
