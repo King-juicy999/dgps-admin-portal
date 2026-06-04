@@ -525,10 +525,39 @@
   </div><!-- end page-portal -->
 
   <!-- Application Detail Modal -->
-  <div id="app-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:1000; align-items:center; justify-content:center;">
-    <div style="background:#fff; border-radius:16px; width:90%; max-width:600px; max-height:85vh; overflow-y:auto; padding:2rem; position:relative;">
-      <button onclick="closeAppModal()" style="position:absolute; top:1rem; right:1rem; background:none; border:none; cursor:pointer; font-size:1.2rem; color:#666;">✕</button>
-      <div id="app-modal-content">Loading...</div>
+  <div id="app-detail-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:1000; align-items:center; justify-content:center;">
+    <div style="background:#fff; border-radius:12px; width:90%; max-width:900px; max-height:90vh; overflow-y:auto; position:relative; display:flex; flex-direction:column;">
+      <!-- Header -->
+      <div style="padding:18px 20px; border-bottom:0.5px solid #dce8de; display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
+        <h2 style="font-size:14px; font-weight:600; color:#0d1a0f; margin:0;">Application Detail</h2>
+        <button onclick="closeAppModal()" style="background:none; border:none; cursor:pointer; font-size:1.3rem; color:#9ab09e; padding:0; width:24px; height:24px; display:flex; align-items:center; justify-content:center;">✕</button>
+      </div>
+      
+      <!-- Content -->
+      <div style="flex:1; overflow-y:auto; padding:20px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:30px; margin-bottom:20px;">
+          <!-- Left: Read-only fields -->
+          <div>
+            <h3 style="font-size:11px; font-weight:600; color:#0a7a24; text-transform:uppercase; letter-spacing:0.07em; margin-bottom:12px;">Student Information</h3>
+            <div id="app-detail-left">Loading...</div>
+          </div>
+          
+          <!-- Right: Editable fields -->
+          <div>
+            <h3 style="font-size:11px; font-weight:600; color:#0a7a24; text-transform:uppercase; letter-spacing:0.07em; margin-bottom:12px;">Parent/Guardian Details</h3>
+            <div id="app-detail-right">Loading...</div>
+          </div>
+        </div>
+        
+        <!-- Status message -->
+        <div id="app-detail-message" style="display:none; margin-bottom:12px; padding:10px 12px; border-radius:6px; font-size:12px;"></div>
+      </div>
+      
+      <!-- Footer -->
+      <div style="padding:14px 20px; border-top:0.5px solid #dce8de; display:flex; gap:8px; justify-content:flex-end; flex-shrink:0;">
+        <button onclick="closeAppModal()" style="padding:6px 16px; border:0.5px solid #dce8de; background:#fff; color:#5a7a60; border-radius:6px; font-size:11px; font-weight:500; cursor:pointer; font-family:'DM Sans',sans-serif;">Cancel</button>
+        <button onclick="saveApplicationChanges()" style="padding:6px 16px; background:#0a7a24; color:#fff; border:none; border-radius:6px; font-size:11px; font-weight:500; cursor:pointer; font-family:'DM Sans',sans-serif;">Save Changes</button>
+      </div>
     </div>
   </div>
 

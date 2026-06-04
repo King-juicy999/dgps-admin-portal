@@ -604,92 +604,145 @@ function closeExportDropdownOutside(e) {
 
 // View full application in modal
 async function viewApplication(id) {
-  const modal = document.getElementById('app-modal');
-  const content = document.getElementById('app-modal-content');
+  const modal = document.getElementById('app-detail-modal');
+  const leftPanel = document.getElementById('app-detail-left');
+  const rightPanel = document.getElementById('app-detail-right');
+  const msgPanel = document.getElementById('app-detail-message');
+  
+  leftPanel.innerHTML = '<p style="text-align:center; padding:1rem; color:#999;">Loading...</p>';
+  rightPanel.innerHTML = '';
+  msgPanel.style.display = 'none';
   modal.style.display = 'flex';
-  content.innerHTML = '<p style="text-align:center; padding:2rem; color:#999;">Loading...</p>';
+  
+  // Store ID for save handler
+  modal.dataset.studentId = id;
 
   try {
-    const res = await fetch(`${API_BASE}/api/admin/applications/${id}/`);
+    const res = await fetch(`${API_BASE}/api/students/${id}/`);
     const json = await res.json();
 
     if (!json.success) throw new Error('Not found');
 
     const d = json.data;
-    content.innerHTML = `
-      <h2 style="font-size:1.1rem; color:#0a7a24; margin-bottom:1.5rem; padding-bottom:0.75rem; border-bottom:2px solid #f0f0f0;">
-        Full Application — ${d.full_name}
-      </h2>
-
-      <div style="margin-bottom:1rem;">
-        <div style="font-size:0.75rem; font-weight:700; color:#0a7a24; margin-bottom:0.5rem; text-transform:uppercase; letter-spacing:0.05em;">Student</div>
-        ${modalRow('Full name', d.full_name)}
-        ${modalRow('Date of birth', d.date_of_birth)}
-        ${modalRow('Age', d.age)}
-        ${modalRow('Gender', d.gender)}
-        ${modalRow('Nationality', d.nationality)}
-        ${modalRow('Class applying for', d.class_name)}
-        ${modalRow('Preferred contact', d.preferred_contact_method)}
+    
+    // Left panel: Read-only fields
+    const levelMap = { 'PG': 'Play Group', 'P': 'Primary', 'S': 'Secondary', 'A': 'Adult' };
+    const level = levelMap[d.level] || d.level || '-';
+    
+    leftPanel.innerHTML = `
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        ${detailRow('Student Name', d.student_name || d.full_name || '-')}
+        ${detailRow('Date of Birth', d.date_of_birth || '-')}
+        ${detailRow('Gender', d.gender || '-')}
+        ${detailRow('Level', level)}
+        ${detailRow('Class Applied For', d.class_name || '-')}
+        ${detailRow('Enrollment Date', d.enrollment_date || '-')}
+        ${detailRow('Payment Reference', d.payment_reference || '-')}
+        ${detailRow('Payment Status', d.payment_status || '-')}
+        ${detailRow('Admission Number', d.admission_number || 'Not assigned')}
       </div>
-
-      <div style="margin-bottom:1rem;">
-        <div style="font-size:0.75rem; font-weight:700; color:#0a7a24; margin-bottom:0.5rem; text-transform:uppercase; letter-spacing:0.05em;">Parent / Guardian</div>
-        ${modalRow('Name', d.parent_name)}
-        ${modalRow('Relationship', d.parent_relationship)}
-        ${modalRow('Email', d.parent_email)}
-        ${modalRow('Phone', d.parent_phone)}
-        ${modalRow('Additional phone', d.parent_phone_2)}
-        ${modalRow('Occupation', d.parent_occupation)}
-        ${modalRow('Workplace', d.parent_workplace)}
-        ${modalRow('Work address', d.parent_work_address)}
-        ${modalRow('Home address', d.parent_home_address)}
-      </div>
-
-      <div style="margin-bottom:1rem;">
-        <div style="font-size:0.75rem; font-weight:700; color:#0a7a24; margin-bottom:0.5rem; text-transform:uppercase; letter-spacing:0.05em;">Emergency Contact</div>
-        ${modalRow('Name', d.emergency_contact_name)}
-        ${modalRow('Phone', d.emergency_contact_phone)}
-        ${modalRow('Relationship', d.emergency_contact_relationship)}
-      </div>
-
-      <div style="margin-bottom:1rem;">
-        <div style="font-size:0.75rem; font-weight:700; color:#0a7a24; margin-bottom:0.5rem; text-transform:uppercase; letter-spacing:0.05em;">Medical</div>
-        ${modalRow('Medical info / allergies', d.medical_information)}
-      </div>
-
-      <div style="margin-bottom:1rem;">
-        <div style="font-size:0.75rem; font-weight:700; color:#0a7a24; margin-bottom:0.5rem; text-transform:uppercase; letter-spacing:0.05em;">Payment</div>
-        ${modalRow('Reference', d.payment_reference)}
-        ${modalRow('Amount paid', d.amount_paid)}
-        ${modalRow('Payment status', d.payment_status)}
-      </div>
-
-      <div style="font-size:0.75rem; color:#999; text-align:right; margin-top:1rem;">
-        Applied: ${d.created_at ? new Date(d.created_at).toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'}) : '-'}
+    `;
+    
+    // Right panel: Editable fields
+    rightPanel.innerHTML = `
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div>
+          <label style="display:block; font-size:9px; font-weight:500; color:#7a9a80; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;">Parent/Guardian Name</label>
+          <input type="text" id="edit-parent-name" value="${d.parent_name || ''}" style="width:100%; padding:8px 10px; border:0.5px solid #dce8de; border-radius:6px; font-size:12px; font-family:'DM Sans',sans-serif;">
+        </div>
+        <div>
+          <label style="display:block; font-size:9px; font-weight:500; color:#7a9a80; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;">Parent Email</label>
+          <input type="email" id="edit-parent-email" value="${d.parent_email || ''}" style="width:100%; padding:8px 10px; border:0.5px solid #dce8de; border-radius:6px; font-size:12px; font-family:'DM Sans',sans-serif;">
+        </div>
+        <div>
+          <label style="display:block; font-size:9px; font-weight:500; color:#7a9a80; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;">Parent Phone</label>
+          <input type="tel" id="edit-parent-phone" value="${d.parent_phone || ''}" style="width:100%; padding:8px 10px; border:0.5px solid #dce8de; border-radius:6px; font-size:12px; font-family:'DM Sans',sans-serif;">
+        </div>
+        <div>
+          <label style="display:block; font-size:9px; font-weight:500; color:#7a9a80; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;">Class</label>
+          <input type="text" id="edit-class-name" value="${d.class_name || ''}" style="width:100%; padding:8px 10px; border:0.5px solid #dce8de; border-radius:6px; font-size:12px; font-family:'DM Sans',sans-serif;">
+        </div>
       </div>
     `;
   } catch (err) {
-    content.innerHTML = '<p style="text-align:center; padding:2rem; color:#ef4444;">Failed to load application. Please try again.</p>';
+    leftPanel.innerHTML = '<p style="text-align:center; padding:1rem; color:#ef4444;">Failed to load application.</p>';
+    console.error('viewApplication error:', err);
   }
 }
 
-function modalRow(label, value) {
+function detailRow(label, value) {
   return `
-    <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f3f3f3; font-size:0.875rem;">
-      <span style="color:#777;">${label}</span>
-      <span style="font-weight:500; color:#333; text-align:right; max-width:60%;">${value || '-'}</span>
+    <div style="display:flex; flex-direction:column; gap:4px;">
+      <span style="font-size:9px; font-weight:600; color:#7a9a80; text-transform:uppercase; letter-spacing:0.05em;">${label}</span>
+      <span style="font-size:12px; color:#0d1a0f; font-weight:500;">${value}</span>
     </div>
   `;
 }
 
+// Save application changes
+async function saveApplicationChanges() {
+  const modal = document.getElementById('app-detail-modal');
+  const studentId = modal.dataset.studentId;
+  const msgPanel = document.getElementById('app-detail-message');
+  
+  if (!studentId) {
+    msgPanel.style.display = 'block';
+    msgPanel.style.background = '#fee2e2';
+    msgPanel.style.color = '#991b1b';
+    msgPanel.textContent = 'Error: Student ID not found.';
+    return;
+  }
+
+  const parentName = document.getElementById('edit-parent-name').value.trim();
+  const parentEmail = document.getElementById('edit-parent-email').value.trim();
+  const parentPhone = document.getElementById('edit-parent-phone').value.trim();
+  const className = document.getElementById('edit-class-name').value.trim();
+
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/edit-student/${studentId}/`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        parent_name: parentName,
+        parent_email: parentEmail,
+        parent_phone: parentPhone,
+        class_name: className
+      })
+    });
+
+    const json = await res.json();
+
+    if (!json.success) throw new Error(json.error || 'Save failed');
+
+    msgPanel.style.display = 'block';
+    msgPanel.style.background = '#ecfdf5';
+    msgPanel.style.color = '#065f46';
+    msgPanel.textContent = 'Changes saved successfully.';
+
+    setTimeout(() => {
+      closeAppModal();
+      loadApplications(currentFilter);
+    }, 800);
+  } catch (err) {
+    msgPanel.style.display = 'block';
+    msgPanel.style.background = '#fee2e2';
+    msgPanel.style.color = '#991b1b';
+    msgPanel.textContent = `Error: ${err.message}`;
+    console.error('saveApplicationChanges error:', err);
+  }
+}
+
 function closeAppModal() {
-  document.getElementById('app-modal').style.display = 'none';
+  document.getElementById('app-detail-modal').style.display = 'none';
 }
 
 // Close modal on backdrop click
-document.getElementById('app-modal').addEventListener('click', function(e) {
-  if (e.target === this) closeAppModal();
-});
+const appDetailModal = document.getElementById('app-detail-modal');
+if (appDetailModal) {
+  appDetailModal.addEventListener('click', function(e) {
+    if (e.target === this) closeAppModal();
+  });
+}
 
 // Soft delete application
 async function deleteApplication(id, btnEl) {

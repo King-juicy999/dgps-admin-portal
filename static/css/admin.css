@@ -415,6 +415,9 @@ tr:hover td { background: #fafcfa; }
   .ai-footer { flex-shrink: 0; background: #fff; border-top: 0.5px solid var(--border); padding: 10px 14px; }
   .ai-main-top { flex-shrink: 0; }
   .ai-main { flex: 1; min-width: 0; overflow: hidden; }
+
+  /* ── APPLICATION DETAIL MODAL ── */
+  #app-detail-modal > div { width: 95%; max-width: 850px; }
 }
 
 @media (max-width: 540px) {
@@ -422,4 +425,9 @@ tr:hover td { background: #fafcfa; }
   .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .stat-value { font-size: 18px; }
   .login-form-wrap { max-width: 100%; }
+
+  /* ── APPLICATION DETAIL MODAL ── */
+  #app-detail-modal > div { width: 98%; max-width: 100%; padding: 0; }
+  #app-detail-modal > div > div:nth-child(2) { padding: 16px; }
+  #app-detail-modal > div > div:nth-child(2) > div { grid-template-columns: 1fr; gap: 20px; }
 }
