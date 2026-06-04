@@ -370,33 +370,37 @@ tr:hover td { background: #fafcfa; }
     background: #fff;
     border: 0.5px solid var(--border);
     border-radius: 12px;
-    padding: 16px;
+    padding: 14px 16px;
     box-shadow: 0 1px 4px rgba(0,0,0,0.04);
   }
   .app-table tbody td {
-    display: block;
-    padding: 4px 0;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 6px 0;
     border: none;
+    border-bottom: 0.5px solid #f0f4f1;
     font-size: 12px;
     color: var(--ink);
+    gap: 12px;
+  }
+  .app-table tbody td:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
   }
   .app-table tbody td::before {
     content: attr(data-label);
-    display: block;
     font-size: 9px;
     font-weight: 600;
     color: var(--muted);
     text-transform: uppercase;
     letter-spacing: 0.07em;
-    margin-bottom: 2px;
-  }
-  .app-table tbody td + td {
-    margin-top: 8px;
-    padding-top: 8px;
-    border-top: 0.5px solid #f0f4f1;
+    flex-shrink: 0;
+    min-width: 80px;
+    padding-top: 1px;
   }
   .app-table tbody td:first-child { display: none; }
-  .app-table tbody td:last-child { border-top: 0.5px solid #f0f4f1; margin-top: 10px; padding-top: 10px; }
 
   /* ── ASSISTANT ── */
   .ai-view { padding: 0 !important; overflow: hidden; }
