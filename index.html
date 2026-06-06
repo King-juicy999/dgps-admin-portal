@@ -869,11 +869,6 @@
     }
 
     async function saveDetailChanges() {
-      if (!currentDetailAdmissionNumber) {
-        showDetailMsg('This student has no admission number yet — only enrolled students can be edited.', 'error');
-        return;
-      }
-
       const payload = {
         full_name:                      document.getElementById('e-full-name').value.trim(),
         date_of_birth:                  document.getElementById('e-dob').value,
@@ -898,7 +893,7 @@
       };
 
       try {
-        const res = await fetch(`${CONFIG.BACKEND_URL}/api/students/api/edit/${currentDetailAdmissionNumber}/`, {
+        const res = await fetch(`${CONFIG.BACKEND_URL}/api/admin/students/${currentDetailStudentId}/edit/`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
