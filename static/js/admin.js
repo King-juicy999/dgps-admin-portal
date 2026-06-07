@@ -428,6 +428,124 @@ async function loadPayments() {
   }
 }
 
+function renderApplicationRow(s) {
+  const paid = s.payment_status === 'paid';
+  const name = s.full_name || s.student || '—';
+  const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  const cls = s.class_name || '—';
+  const parent = s.parent_name || s.parent || '—';
+  const ref = s.payment_reference || s.reference || '—';
+  const amount = paid ? (s.amount_paid || s.amount || '—') : 'Unpaid';
+  const id = s.id;
+
+  return `
+    <tr>
+      <td class="row-check col-check">
+        <input type="checkbox" class="app-checkbox" data-id="${id}"
+          style="accent-color:#0a7a24; width:15px; height:15px; cursor:pointer;"
+          ${selectedApplicationIds.has(id) ? 'checked' : ''}
+          onchange="toggleAppSelection(${id}, this.checked)">
+      </td>
+      <td class="col-student">
+        <div class="t-name">${name}</div>
+        <div class="t-sub">${cls}</div>
+      </td>
+      <td class="col-class t-sub">${cls}</td>
+      <td class="col-parent">
+        <div class="t-name">${parent}</div>
+      </td>
+      <td class="col-reference"><span class="t-ref">${ref}</span></td>
+      <td class="col-amount ${paid ? '' : 'unpaid-text'}">${amount}</td>
+      <td class="col-actions">
+        <div class="action-row">
+          <div class="act-btn" onclick="viewApplication(${id})" title="View">
+            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+          </div>
+          <div class="act-btn danger" onclick="deleteApplication(${id}, this)" title="Delete">
+            <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+          </div>
+        </div>
+      </td>
+      <td class="mob-card-full" style="display:none;"
+          data-name="${name}" data-initials="${initials}" data-class="${cls}"
+          data-parent="${parent}" data-ref="${ref}" data-amount="${amount}"
+          data-paid="${paid}" data-id="${id}">
+      </td>
+    </tr>
+  `;
+}
+
+function buildMobileCards() {
+  if (window.innerWidth > 900) return;
+
+  document.querySelectorAll('#applications-tbody tr').forEach(tr => {
+    if (tr.querySelector('.mob-card-header')) return;
+
+    const cells = tr.querySelectorAll('td');
+    let data = null;
+    cells.forEach(td => {
+      if (td.classList.contains('mob-card-full')) data = td;
+    });
+    if (!data) return;
+
+    const name     = data.dataset.name;
+    const initials = data.dataset.initials;
+    const cls      = data.dataset.class;
+    const parent   = data.dataset.parent;
+    const ref      = data.dataset.ref;
+    const amount   = data.dataset.amount;
+    const paid     = data.dataset.paid === 'true';
+    const id       = data.dataset.id;
+
+    cells.forEach(td => td.style.display = 'none');
+
+    const header = document.createElement('div');
+    header.className = 'mob-card-header';
+    header.innerHTML = `
+      <div class="mob-avatar">${initials}</div>
+      <div class="mob-student-info">
+        <div class="mob-student-name">${name}</div>
+        <div class="mob-student-class">${cls}</div>
+      </div>
+      <span class="mob-pay-badge ${paid ? 'paid' : 'unpaid'}">${paid ? 'Paid' : 'Unpaid'}</span>
+    `;
+
+    const body = document.createElement('div');
+    body.className = 'mob-card-body';
+    body.innerHTML = `
+      <div class="mob-info-row">
+        <span class="mob-info-label">Parent</span>
+        <span class="mob-info-value">${parent}</span>
+      </div>
+      <div class="mob-info-row">
+        <span class="mob-info-label">Reference</span>
+        <span class="mob-info-value"><span class="mob-ref-pill">${ref}</span></span>
+      </div>
+      <div class="mob-info-row">
+        <span class="mob-info-label">Amount</span>
+        <span class="mob-info-value mob-amount-value ${paid ? '' : 'unpaid-text'}">${amount}</span>
+      </div>
+    `;
+
+    const footer = document.createElement('div');
+    footer.className = 'mob-card-footer';
+    footer.innerHTML = `
+      <button class="mob-action-btn primary" onclick="viewApplication(${id})">
+        <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+        View details
+      </button>
+      <button class="mob-action-btn danger" onclick="deleteApplication(${id}, this)">
+        <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+        Delete
+      </button>
+    `;
+
+    tr.appendChild(header);
+    tr.appendChild(body);
+    tr.appendChild(footer);
+  });
+}
+
 // Render the full applications table
 function renderApplicationsTable(data) {
   const tbody = document.querySelector('#view-applications table tbody');
@@ -438,32 +556,9 @@ function renderApplicationsTable(data) {
     return;
   }
 
-  tbody.innerHTML = data.map(app => `
-    <tr>
-      <td class="row-check" data-label="Select">
-        <input type="checkbox" class="app-checkbox" data-id="${app.id}"
-          style="accent-color:#0a7a24; width:15px; height:15px; cursor:pointer;"
-          ${selectedApplicationIds.has(app.id) ? 'checked' : ''}
-          onchange="toggleAppSelection(${app.id}, this.checked)">
-      </td>
-      <td data-label="Student"><div class="t-name">${app.student}</div></td>
-      <td class="t-sub" data-label="Class">${app.class_name}</td>
-      <td data-label="Parent">${app.parent}</td>
-      <td data-label="Reference"><span class="t-ref">${app.reference}</span></td>
-      <td data-label="Amount">${app.payment_status === 'paid' ? app.amount : '<span class="unpaid-text">Unpaid</span>'}</td>
-      <td data-label="Actions">
-        <div class="action-row">
-          <div class="act-btn" onclick="openDetailModal(${app.id})" title="View full application">
-            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-          </div>
-          <div class="act-btn danger" onclick="deleteApplication(${app.id}, this)" title="Delete application">
-            <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-          </div>
-        </div>
-      </td>
-    </tr>
-  `).join('');
+  tbody.innerHTML = data.map(s => renderApplicationRow(s)).join('');
   syncSelectAllApplications();
+  buildMobileCards();
 }
 
 // Render the dashboard recent applications table (top 3)
@@ -931,4 +1026,6 @@ document.addEventListener('DOMContentLoaded', function() {
   if (searchInput) {
     searchInput.addEventListener('input', e => searchApplications(e.target.value));
   }
+
+  window.addEventListener('resize', buildMobileCards);
 });
