@@ -201,17 +201,67 @@
           <div class="login-form-title">Welcome back</div>
           <div class="login-form-sub">Sign in to your admin account</div>
           <div class="lf-group">
+            <label>Full name</label>
+            <input class="lf-input" type="text" id="login-fullname" placeholder="e.g. William">
+          </div>
+          <div class="lf-group">
             <label>Email address</label>
             <input class="lf-input" type="email" id="login-email" placeholder="you@dgpschools.com">
           </div>
           <div class="lf-group">
             <label>Password</label>
             <input class="lf-input" type="password" id="login-password" placeholder="••••••••••">
-            <div class="lf-sub">Your password was set by the Super Admin</div>
+            <div class="lf-sub">First-time? Use the one-time password sent to your email</div>
           </div>
           <div class="lf-error" id="login-error"></div>
           <button class="login-btn" onclick="doLogin()">Sign in to portal</button>
           <div class="login-forgot">Forgot password? <a href="mailto:dgpschools2024@gmail.com">Contact Super Admin</a></div>
+          <div class="login-security">
+            <svg viewBox="0 0 24 24" width="10" height="10" fill="#9ab09e"><path d="M12 2L3 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-9-5z"/></svg>
+            <span>Secured · Diadem Golden Pearl Schools · 2025</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       CHANGE PASSWORD PAGE (first login)
+  ══════════════════════════════ -->
+  <div id="page-change-password" class="page">
+    <div class="login-wrap">
+      <div class="login-left">
+        <div class="login-grid"></div>
+        <div class="login-scan"></div>
+        <div class="login-corner tl"></div>
+        <div class="login-corner br"></div>
+        <div class="login-left-content">
+          <div class="login-logo">
+            <div class="login-logo-mark">
+              <svg viewBox="0 0 24 24"><path d="M12 2L3 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-9-5z"/></svg>
+            </div>
+            <div class="login-logo-name">DGPS<span>Admin Portal</span></div>
+          </div>
+          <div class="login-tagline">
+            <h2>Set your<br><em>password.</em></h2>
+            <p>Your one-time password has been used.<br>Please set a new secure password to continue.</p>
+          </div>
+        </div>
+      </div>
+      <div class="login-right">
+        <div class="login-form-wrap">
+          <div class="login-form-title">Create new password</div>
+          <div class="login-form-sub">Choose a password you'll remember</div>
+          <div class="lf-group">
+            <label>New password</label>
+            <input class="lf-input" type="password" id="cp-new" placeholder="Min. 8 characters">
+          </div>
+          <div class="lf-group">
+            <label>Confirm password</label>
+            <input class="lf-input" type="password" id="cp-confirm" placeholder="Re-enter your password">
+          </div>
+          <div class="lf-error" id="cp-error"></div>
+          <button class="login-btn" onclick="doChangePassword()">Set password & continue</button>
           <div class="login-security">
             <svg viewBox="0 0 24 24" width="10" height="10" fill="#9ab09e"><path d="M12 2L3 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-9-5z"/></svg>
             <span>Secured · Diadem Golden Pearl Schools · 2025</span>

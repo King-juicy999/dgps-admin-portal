@@ -1,62 +1,150 @@
-const BACKEND_URL = window.DGPS_CONFIG.BACKEND_URL;
+const CONFIG = window.DGPS_CONFIG;
+const BACKEND_URL = CONFIG.BACKEND_URL;
 const GOOGLE_CLIENT_ID = '802466171345-er0f9b8hdt95j0bi9a8a9rcs3fsv5gk0.apps.googleusercontent.com';
 const GOOGLE_SCOPES = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file';
 let googleAccessToken = null;
 let selectedApplicationIds = new Set();
 
+function getAuthHeaders() {
+  const token = sessionStorage.getItem('dgps_admin_token');
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': `Token ${token}`
+  };
+}
+
 /* ══════════════════════════════
    DGPS ADMIN PORTAL — JS
 ══════════════════════════════ */
 
-/* ── MOCK AUTH ── */
-const MOCK_USERS = [
-  { email: 'william@dgpschools.com', password: 'admin2025', role: 'super', name: 'William A.' },
-  { email: 'secretary@dgpschools.com', password: 'admin2025', role: 'admin', name: 'Mrs. Adebayo' },
-  { email: 'principal@dgpschools.com', password: 'admin2025', role: 'admin', name: 'Mr. Taiwo' }
-];
-
-let currentUser = null;
-
-function doLogin() {
+async function doLogin() {
+  const fullName = document.getElementById('login-fullname').value.trim();
   const email = document.getElementById('login-email').value.trim();
   const password = document.getElementById('login-password').value;
   const errorEl = document.getElementById('login-error');
 
-  const user = MOCK_USERS.find(u => u.email === email && u.password === password);
-  if (!user) {
-    errorEl.textContent = 'Incorrect email or password. Please try again.';
+  errorEl.textContent = '';
+
+  if (!fullName || !email || !password) {
+    errorEl.textContent = 'Please fill in all fields.';
     return;
   }
-  errorEl.textContent = '';
-  currentUser = user;
-  applyRole(user);
-  showPage('portal');
-  loadParents();
+
+  try {
+    const res = await fetch(`${CONFIG.BACKEND_URL}/api/admin/auth/login/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ full_name: fullName, email: email, password: password })
+    });
+    const json = await res.json();
+
+    if (!json.success) {
+      errorEl.textContent = json.message || 'Invalid credentials. Please try again.';
+      return;
+    }
+
+    sessionStorage.setItem('dgps_admin_token', json.token);
+    sessionStorage.setItem('dgps_admin_role', json.role);
+    sessionStorage.setItem('dgps_admin_name', json.full_name);
+    sessionStorage.setItem('dgps_admin_email', json.email);
+
+    if (json.must_change_password) {
+      showPage('change-password');
+      return;
+    }
+
+    applyRole(json.role, json.full_name);
+    showPage('portal');
+    loadDashboard();
+
+  } catch (err) {
+    errorEl.textContent = 'Could not connect to server. Please try again.';
+    console.error(err);
+  }
 }
 
-function doLogout() {
-  currentUser = null;
+async function doLogout() {
+  try {
+    await fetch(`${CONFIG.BACKEND_URL}/api/admin/auth/logout/`, {
+      method: 'POST',
+      headers: getAuthHeaders()
+    });
+  } catch (e) { /* silent — clear session regardless */ }
+
+  sessionStorage.removeItem('dgps_admin_token');
+  sessionStorage.removeItem('dgps_admin_role');
+  sessionStorage.removeItem('dgps_admin_name');
+  sessionStorage.removeItem('dgps_admin_email');
   showPage('login');
-  document.getElementById('login-email').value = '';
-  document.getElementById('login-password').value = '';
 }
 
-function applyRole(user) {
-  document.getElementById('sb-username').textContent = user.name;
-  document.getElementById('sb-urole').textContent = user.role === 'super' ? 'Super Admin' : 'Admin';
-  document.getElementById('sb-role-label').textContent = user.role === 'super' ? 'Super Admin' : 'Admin';
-  document.getElementById('sb-avatar').textContent = user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+function applyRole(role, fullName) {
+  const name = fullName || sessionStorage.getItem('dgps_admin_name') || '';
+  const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
 
-  const superItems = document.querySelectorAll('.super-only');
-  superItems.forEach(el => {
-    el.style.display = user.role === 'super' ? '' : 'none';
+  document.getElementById('sb-avatar').textContent = initials;
+  document.getElementById('sb-username').textContent = name;
+
+  const roleLabels = {
+    'super_admin': 'Super Admin',
+    'admin': 'Admin',
+    'teacher': 'Teacher'
+  };
+  const roleLabel = roleLabels[role] || 'Admin';
+  document.getElementById('sb-urole').textContent = roleLabel;
+  document.getElementById('sb-role-label').textContent = roleLabel;
+
+  const isSuperAdmin = role === 'super_admin';
+  document.querySelectorAll('.super-only').forEach(el => {
+    el.style.display = isSuperAdmin ? '' : 'none';
   });
 }
 
+async function doChangePassword() {
+  const newPass = document.getElementById('cp-new').value;
+  const confirm = document.getElementById('cp-confirm').value;
+  const errorEl = document.getElementById('cp-error');
+
+  errorEl.textContent = '';
+
+  if (newPass.length < 8) {
+    errorEl.textContent = 'Password must be at least 8 characters.';
+    return;
+  }
+  if (newPass !== confirm) {
+    errorEl.textContent = 'Passwords do not match.';
+    return;
+  }
+
+  try {
+    const res = await fetch(`${CONFIG.BACKEND_URL}/api/admin/auth/change-password/`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ new_password: newPass })
+    });
+    const json = await res.json();
+
+    if (!json.success) {
+      errorEl.textContent = json.message || 'Could not update password.';
+      return;
+    }
+
+    const role = sessionStorage.getItem('dgps_admin_role');
+    const name = sessionStorage.getItem('dgps_admin_name');
+    applyRole(role, name);
+    showPage('portal');
+    loadDashboard();
+
+  } catch (err) {
+    errorEl.textContent = 'Could not connect to server. Please try again.';
+    console.error(err);
+  }
+}
+
 /* ── PAGE SWITCH ── */
-function showPage(id) {
+function showPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + id).classList.add('active');
+  document.getElementById('page-' + name).classList.add('active');
 }
 
 /* ── NAVIGATION ── */
@@ -1006,14 +1094,7 @@ async function createGoogleSheet(rows) {
 }
 
 // Load on page ready if already on applications or dashboard
-document.addEventListener('DOMContentLoaded', function() {
-  // Show loading state immediately
-  const tbodies = document.querySelectorAll('tbody');
-  tbodies.forEach(tb => {
-    tb.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:2rem; color:#999;">Loading...</td></tr>`;
-  });
-
-  // Wake Render, then load all data
+function loadDashboard() {
   fetch(`${API_BASE}/`, { method: 'HEAD', mode: 'no-cors' })
     .catch(() => {})
     .finally(() => {
@@ -1021,6 +1102,14 @@ document.addEventListener('DOMContentLoaded', function() {
       loadPaymentStats();
       loadPayments();
     });
+  loadParents();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const tbodies = document.querySelectorAll('tbody');
+  tbodies.forEach(tb => {
+    tb.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:2rem; color:#999;">Loading...</td></tr>`;
+  });
 
   const searchInput = document.querySelector('.topbar-search');
   if (searchInput) {
@@ -1028,4 +1117,17 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   window.addEventListener('resize', buildMobileCards);
+
+  const token = sessionStorage.getItem('dgps_admin_token');
+  const role = sessionStorage.getItem('dgps_admin_role');
+  const name = sessionStorage.getItem('dgps_admin_name');
+
+  if (!token) {
+    showPage('login');
+    return;
+  }
+
+  applyRole(role, name);
+  showPage('portal');
+  loadDashboard();
 });
