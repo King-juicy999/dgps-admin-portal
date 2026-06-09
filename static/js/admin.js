@@ -823,6 +823,7 @@ if (_originalNavTo) {
     if (view === 'payments') {
       loadPayments();
     }
+    if (view === 'manage-admins') loadManageAdmins();
   };
 }
 
@@ -1103,6 +1104,179 @@ function loadDashboard() {
       loadPayments();
     });
   loadParents();
+}
+
+// ══════════════════════════════
+// MANAGE ADMINS
+// ══════════════════════════════
+
+async function loadManageAdmins() {
+  const tbody = document.getElementById('manage-admins-tbody');
+  tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:2rem; color:#999;">Loading...</td></tr>`;
+
+  try {
+    const res = await fetch(`${CONFIG.BACKEND_URL}/api/admin/admins/list/`, {
+      headers: getAuthHeaders()
+    });
+    const json = await res.json();
+    if (!json.success) throw new Error('Failed to load');
+
+    tbody.innerHTML = '';
+    json.admins.forEach(admin => {
+      const isSuperAdmin = admin.role === 'super_admin';
+      const roleLabels = { super_admin: 'Super Admin', admin: 'Admin', teacher: 'Teacher' };
+      const roleLabel = roleLabels[admin.role] || admin.role;
+      const badgeClass = isSuperAdmin ? 'super' : admin.role === 'admin' ? 'admin' : 'teacher';
+      const lastActive = admin.last_active || 'Never';
+      const statusStyle = !admin.is_active ? 'opacity:0.5;' : '';
+
+      const actions = isSuperAdmin
+        ? `<span class="t-sub">Cannot modify</span>`
+        : `<div class="action-row">
+            <button class="btn btn-outline" style="font-size:10px;padding:3px 9px;"
+              onclick="suspendAdmin(${admin.id}, ${admin.is_active})">
+              ${admin.is_active ? 'Suspend' : 'Reactivate'}
+            </button>
+            <button class="btn btn-outline" style="font-size:10px;padding:3px 9px;"
+              onclick="resetAdminPassword(${admin.id}, '${admin.email}')">
+              Reset OTP
+            </button>
+            <div class="act-btn danger" onclick="deleteAdmin(${admin.id}, '${admin.full_name || admin.email}')">
+              <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+            </div>
+           </div>`;
+
+      tbody.innerHTML += `
+        <tr style="${statusStyle}">
+          <td><div class="t-name">${admin.full_name || '—'}</div></td>
+          <td class="t-sub">${admin.email}</td>
+          <td><span class="role-badge ${badgeClass}">${roleLabel}</span></td>
+          <td class="t-sub">${lastActive}</td>
+          <td>${actions}</td>
+        </tr>`;
+    });
+
+    if (json.admins.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:2rem; color:#999;">No admins found.</td></tr>`;
+    }
+
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:2rem; color:#c0392b;">Failed to load admins.</td></tr>`;
+    console.error(err);
+  }
+}
+
+function openAddAdminModal() {
+  document.getElementById('new-admin-name').value = '';
+  document.getElementById('new-admin-email').value = '';
+  document.getElementById('new-admin-role').value = 'admin';
+  const msg = document.getElementById('add-admin-msg');
+  msg.style.display = 'none';
+  msg.textContent = '';
+  document.getElementById('add-admin-modal').style.display = 'flex';
+}
+
+function closeAddAdminModal() {
+  document.getElementById('add-admin-modal').style.display = 'none';
+}
+
+async function submitAddAdmin() {
+  const name = document.getElementById('new-admin-name').value.trim();
+  const email = document.getElementById('new-admin-email').value.trim();
+  const role = document.getElementById('new-admin-role').value;
+  const msg = document.getElementById('add-admin-msg');
+
+  msg.style.display = 'none';
+
+  if (!name || !email) {
+    msg.textContent = 'Full name and email are required.';
+    msg.style.color = '#c0392b';
+    msg.style.display = 'block';
+    return;
+  }
+
+  try {
+    const res = await fetch(`${CONFIG.BACKEND_URL}/api/admin/admins/create/`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ full_name: name, email: email, role: role })
+    });
+    const json = await res.json();
+
+    if (!json.success) {
+      msg.textContent = json.message || 'Could not create account.';
+      msg.style.color = '#c0392b';
+      msg.style.display = 'block';
+      return;
+    }
+
+    msg.textContent = `Account created. OTP sent to ${email}.`;
+    msg.style.color = '#0a7a24';
+    msg.style.display = 'block';
+
+    setTimeout(() => {
+      closeAddAdminModal();
+      loadManageAdmins();
+    }, 1800);
+
+  } catch (err) {
+    msg.textContent = 'Could not connect to server. Please try again.';
+    msg.style.color = '#c0392b';
+    msg.style.display = 'block';
+    console.error(err);
+  }
+}
+
+async function deleteAdmin(adminId, adminName) {
+  if (!confirm(`Delete ${adminName}? This cannot be undone.`)) return;
+
+  try {
+    const res = await fetch(`${CONFIG.BACKEND_URL}/api/admin/admins/${adminId}/delete/`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    const json = await res.json();
+    if (!json.success) throw new Error(json.message);
+    loadManageAdmins();
+  } catch (err) {
+    alert('Could not delete admin. Please try again.');
+    console.error(err);
+  }
+}
+
+async function suspendAdmin(adminId, currentlyActive) {
+  const action = currentlyActive ? 'suspend' : 'reactivate';
+  if (!confirm(`Are you sure you want to ${action} this admin?`)) return;
+
+  try {
+    const res = await fetch(`${CONFIG.BACKEND_URL}/api/admin/admins/${adminId}/suspend/`, {
+      method: 'PATCH',
+      headers: getAuthHeaders()
+    });
+    const json = await res.json();
+    if (!json.success) throw new Error(json.message);
+    loadManageAdmins();
+  } catch (err) {
+    alert('Could not update admin status. Please try again.');
+    console.error(err);
+  }
+}
+
+async function resetAdminPassword(adminId, adminEmail) {
+  if (!confirm(`Reset OTP for ${adminEmail}? A new one-time password will be sent to their email.`)) return;
+
+  try {
+    const res = await fetch(`${CONFIG.BACKEND_URL}/api/admin/admins/${adminId}/reset-password/`, {
+      method: 'POST',
+      headers: getAuthHeaders()
+    });
+    const json = await res.json();
+    if (!json.success) throw new Error(json.message);
+    alert(`Done. New OTP sent to ${adminEmail}.`);
+  } catch (err) {
+    alert('Could not reset password. Please try again.');
+    console.error(err);
+  }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
