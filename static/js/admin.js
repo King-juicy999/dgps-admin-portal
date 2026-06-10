@@ -1134,14 +1134,18 @@ async function loadManageAdmins() {
         ? `<span class="t-sub">Cannot modify</span>`
         : `<div class="action-row">
             <button class="btn btn-outline" style="font-size:10px;padding:3px 9px;"
+              onclick="openEditAdminModal(${admin.id}, '${(admin.full_name || '').replace(/'/g, "\\'")}', '${admin.email}', '${admin.role}')">
+              Edit
+            </button>
+            <button class="btn btn-outline" style="font-size:10px;padding:3px 9px;"
               onclick="suspendAdmin(${admin.id}, ${admin.is_active})">
               ${admin.is_active ? 'Suspend' : 'Reactivate'}
             </button>
             <button class="btn btn-outline" style="font-size:10px;padding:3px 9px;"
               onclick="resetAdminPassword(${admin.id}, '${admin.email}')">
-              Reset OTP
+              Reset Password
             </button>
-            <div class="act-btn danger" onclick="deleteAdmin(${admin.id}, '${admin.full_name || admin.email}')">
+            <div class="act-btn danger" onclick="deleteAdmin(${admin.id}, '${(admin.full_name || admin.email).replace(/'/g, "\\'")}')">
               <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
             </div>
            </div>`;
@@ -1275,6 +1279,69 @@ async function resetAdminPassword(adminId, adminEmail) {
     alert(`Done. New OTP sent to ${adminEmail}.`);
   } catch (err) {
     alert('Could not reset password. Please try again.');
+    console.error(err);
+  }
+}
+
+function openEditAdminModal(adminId, fullName, email, role) {
+  document.getElementById('edit-admin-id').value = adminId;
+  document.getElementById('edit-admin-name').value = fullName;
+  document.getElementById('edit-admin-email').value = email;
+  document.getElementById('edit-admin-role').value = role;
+  const msg = document.getElementById('edit-admin-msg');
+  msg.style.display = 'none';
+  msg.textContent = '';
+  document.getElementById('edit-admin-modal').style.display = 'flex';
+}
+
+function closeEditAdminModal() {
+  document.getElementById('edit-admin-modal').style.display = 'none';
+}
+
+async function submitEditAdmin() {
+  const adminId = document.getElementById('edit-admin-id').value;
+  const fullName = document.getElementById('edit-admin-name').value.trim();
+  const email = document.getElementById('edit-admin-email').value.trim();
+  const role = document.getElementById('edit-admin-role').value;
+  const msg = document.getElementById('edit-admin-msg');
+
+  msg.style.display = 'none';
+
+  if (!fullName || !email) {
+    msg.textContent = 'Full name and email are required.';
+    msg.style.color = '#c0392b';
+    msg.style.display = 'block';
+    return;
+  }
+
+  try {
+    const res = await fetch(`${CONFIG.BACKEND_URL}/api/admin/admins/${adminId}/edit/`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ full_name: fullName, email: email, role: role })
+    });
+    const json = await res.json();
+
+    if (!json.success) {
+      msg.textContent = json.message || 'Could not save changes.';
+      msg.style.color = '#c0392b';
+      msg.style.display = 'block';
+      return;
+    }
+
+    msg.textContent = 'Changes saved successfully.';
+    msg.style.color = '#0a7a24';
+    msg.style.display = 'block';
+
+    setTimeout(() => {
+      closeEditAdminModal();
+      loadManageAdmins();
+    }, 1200);
+
+  } catch (err) {
+    msg.textContent = 'Could not connect to server. Please try again.';
+    msg.style.color = '#c0392b';
+    msg.style.display = 'block';
     console.error(err);
   }
 }
