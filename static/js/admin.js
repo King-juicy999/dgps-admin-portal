@@ -508,6 +508,7 @@ async function loadPayments() {
         <td>${p.amount_display}</td>
         <td class="t-sub">${p.payment_date}</td>
         <td><span class="role-badge super" style="font-size:10px;">Paid</span></td>
+        <td class="super-only"><div class="act-btn danger" onclick="deletePayment(${p.id}, this)" title="Delete">Delete</div></td>
       </tr>
     `).join('');
 
@@ -783,6 +784,26 @@ function closeExportDropdown() {
 function closeExportDropdownOutside(e) {
   const dropdown = document.getElementById('export-dropdown');
   if (dropdown && !dropdown.contains(e.target)) closeExportDropdown();
+}
+
+// Delete payment record (super admin only)
+async function deletePayment(id, btnEl) {
+  if (!confirm('Delete this payment record? This cannot be undone.')) return;
+  try {
+    const res = await fetch(`${CONFIG.BACKEND_URL}/api/admin/payments/${id}/delete/`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    const json = await res.json();
+    if (json.success) {
+      loadPayments();
+    } else {
+      alert('Delete failed. Please try again.');
+    }
+  } catch (err) {
+    alert('Delete failed. Please try again.');
+    console.error(err);
+  }
 }
 
 // Soft delete application
